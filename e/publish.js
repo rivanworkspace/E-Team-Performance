@@ -25,11 +25,12 @@
     await saveTok(v);render();msg(tr2("Token tersimpan.","Token saved."),"ok");};
    function gh(m,u){return fetch(u,{method:m,headers:{Authorization:"Bearer "+(document.getElementById("ghTok").value||"").trim(),Accept:"application/vnd.github+json"},cache:"no-store"}).catch(function(){return null;});}
    return;}
-  b.innerHTML=head+'<div class="dpa"><button class="btn primary" id="ghGo">☁️ Publish</button><button class="btn" id="ghTokDel">'+tr2("Ganti token","Change token")+'</button><span class="small" id="ghMsg"></span></div>';
+  b.innerHTML=head+'<div class="dpa"><button class="btn primary" id="ghGo">☁️ Publish</button><button class="btn" id="ghPwGo">🔑 '+tr2("Ganti password TL","Change TL password")+'</button><button class="btn" id="ghTokDel">'+tr2("Ganti token","Change token")+'</button><span class="small" id="ghMsg"></span></div>';
   if(lastMsg)msg(lastMsg,/^✓/.test(lastMsg)?"ok":"");
-  document.getElementById("ghGo").onclick=publish;
+  document.getElementById("ghGo").onclick=publish;document.getElementById("ghPwGo").onclick=goPw;
   document.getElementById("ghTokDel").onclick=function(){if(!confirm(tr2("Hapus token dari Chrome ini?","Remove the token from this Chrome?")))return;TOKEN=null;try{localStorage.removeItem(TK);}catch(e){}lastMsg="";render();};}
- async function ensure(){var dl=document.getElementById("dlBtn");if(!dl)return;var b=el();
+ var lastPw=null;
+ async function ensure(){if(typeof VIEW!=="undefined"&&VIEW==="tl"&&SESSION_PW&&lastPw!==SESSION_PW){if(lastPw!==null)rememberUpdate();lastPw=SESSION_PW;}var dl=document.getElementById("dlBtn");if(!dl)return;var b=el();
   if(typeof VIEW==="undefined"||VIEW!=="tl"){if(b)b.hidden=true;TOKEN=null;TOKPW=null;return;}
   if(!b){b=document.createElement("div");b.id="ghPub";b.className="ghpub";dl.closest(".dpa").before(b);}
   dl.classList.remove("primary");b.hidden=false;var had=TOKEN,pw=TOKPW;await loadTok();if(!b.innerHTML||had!==TOKEN||pw!==TOKPW)render();}
@@ -48,7 +49,7 @@
  function weak(){var w=[];if((SESSION_PW||"").length<MIN)w.push(tr2("password Data TL","TL data password"));
   if(typeof GLK!=="undefined"&&GLK.on()){var g=GLK.gpw||{};GLK.groupsOf(STORE).forEach(function(k){if(!g[k]||g[k].length<MIN)w.push(tr2("password grup ","group password ")+GLK.lbl(k));});}return w;}
  async function publish(){if(busy||!TOKEN)return;var w=weak();
-  if(w.length){msg(tr2("Publish ditahan: "+w.join(", ")+" harus minimal "+MIN+" karakter, karena data di GitHub hanya dilindungi password. Ganti di Update data › Pengaturan tim & skema › Password Data TL.","Publish held: "+w.join(", ")+" must be at least "+MIN+" characters, since data on GitHub is protected only by passwords. Change it in Update data › Team & scheme settings › TL data password."),"er");return;}
+  if(w.length){msg(tr2("Publish ditahan: "+w.join(", ")+" harus minimal "+MIN+" karakter, karena data di GitHub hanya dilindungi password. Isi password baru di kotak yang sekarang terbuka, lalu klik Publish lagi.","Publish held: "+w.join(", ")+" must be at least "+MIN+" characters, since data on GitHub is protected only by passwords. Enter a new password in the box now open, then click Publish again."),"er");goPw();return;}
   busy=true;var bt=document.getElementById("ghGo");if(bt)bt.disabled=true;
   try{msg(tr2("Menyiapkan data…","Preparing data…"));
    var at=vStamp(),ms=[...new Set(STORE.data.map(function(r){return r.month;}))].sort(),note=((document.getElementById("verNote")||{}).value||"").trim();
@@ -69,6 +70,35 @@
  /* the reminder about unsaved changes points to Publish instead of Download */
  if(typeof remItems==="function"){var _ri=remItems;remItems=function(){var it=_ri.apply(this,arguments);it.forEach(function(x){if(x.k&&x.k.indexOf("dirty|")===0){x.t=tr2("Ada perubahan yang belum di-publish ke tim.","There are changes not yet published to the team.");x.act=["ghpub","☁️ Publish"];}});return it;};}
  document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('[data-rem-act="ghpub"]');if(!a)return;var d=document.querySelector(".datap");if(d){d.open=true;}ensure().then(function(){var b=el();if(b)b.scrollIntoView({block:"center",behavior:"smooth"});if(TOKEN)publish();});},true);
+
+ /* open the TL password form (it sits inside the collapsed settings section) */
+ function goPw(){var d=document.querySelector(".datap");if(d)d.open=true;var st=document.querySelector("details.sets");if(st)st.open=true;
+  setTimeout(function(){var i=document.getElementById("pw1");if(i){i.scrollIntoView({block:"center",behavior:"smooth"});i.focus();}},120);}
+ document.addEventListener("click",function(e){if(!(e.target.closest&&e.target.closest("#pwSave")))return;
+  var n=0,iv=setInterval(function(){n++;var m=document.getElementById("pwMsg");if(m&&/Download HTML terbaru|Download latest HTML/.test(m.textContent)){clearInterval(iv);m.textContent=tr2("Password diganti. Klik ☁️ Publish supaya berlaku untuk semua.","Password changed. Click ☁️ Publish so it applies everywhere.");}else if(n>60)clearInterval(iv);},150);},true);
+ /* remember me: the password is kept in this Chrome, locked with a key that cannot leave this browser */
+ var CRK="cred",CKK="credKey",tried=false,pend=null;
+ function idb(){return new Promise(function(res){try{var q=indexedDB.open("te_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){res(q.result);};q.onerror=function(){res(null);};}catch(e){res(null);}});}
+ async function kv(op,k,v){var d=await idb();if(!d)return null;return new Promise(function(res){try{var t=d.transaction("kv",op==="get"?"readonly":"readwrite"),s=t.objectStore("kv"),q=op==="get"?s.get(k):op==="put"?s.put(v,k):s.delete(k);q.onsuccess=function(){res(op==="get"?q.result:null);};q.onerror=function(){res(null);};}catch(e){res(null);}});}
+ async function devKey(){var k=await kv("get",CKK);if(!k){k=await crypto.subtle.generateKey({name:"AES-GCM",length:256},false,["encrypt","decrypt"]);await kv("put",CKK,k);}return k;}
+ async function remSave(who,pw){try{var k=await devKey(),iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},k,_te.encode(pw));await kv("put",CRK,{who:who,iv:iv,ct:new Uint8Array(ct)});}catch(e){}}
+ async function remLoad(){try{var c=await kv("get",CRK);if(!c)return null;var k=await kv("get",CKK);if(!k)return null;var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:c.iv},k,c.ct);return {who:c.who,pw:_td.decode(pt)};}catch(e){return null;}}
+ function remForget(){kv("del",CRK);}
+ async function rememberUpdate(){var c=await remLoad();if(c&&c.who==="__tl"&&SESSION_PW&&c.pw!==SESSION_PW)remSave("__tl",SESSION_PW);}
+ async function gateWatch(){var g=document.getElementById("glGate");if(!g)return;var f=g.querySelector("form");if(!f||f.dataset.rem)return;f.dataset.rem="1";
+  var go=document.getElementById("glGo"),lb=document.createElement("label");lb.className="te-rem";lb.style.cssText="display:flex;flex-direction:row;align-items:center;gap:6px;font-size:12.5px;margin:2px 0 4px";
+  lb.innerHTML='<input type="checkbox" id="teRem" checked style="width:auto;margin:0"> '+tr2("Ingat password di Chrome ini","Remember password in this Chrome");go.before(lb);
+  f.addEventListener("submit",function(){pend={who:document.getElementById("glWho").value,pw:document.getElementById("glPw").value,rem:document.getElementById("teRem").checked};
+   var n=0,iv=setInterval(function(){n++;if(!document.getElementById("glGate")){clearInterval(iv);if(pend){if(pend.rem)remSave(pend.who,pend.pw);else remForget();pend=null;}}
+    else if(n>40||(document.getElementById("glErr")||{}).textContent.indexOf("salah")>=0||(document.getElementById("glErr")||{}).textContent.indexOf("Wrong")>=0){clearInterval(iv);pend=null;}},250);},true);
+  if(tried)return;tried=true;var c=await remLoad();if(!c)return;var sel=document.getElementById("glWho");
+  if(![].some.call(sel.options,function(o){return o.value===c.who;})){remForget();return;}
+  sel.value=c.who;document.getElementById("glPw").value=c.pw;document.getElementById("glErr").textContent=tr2("Masuk otomatis…","Signing in…");
+  var n=0,iv=setInterval(function(){n++;var e=document.getElementById("glErr");if(!document.getElementById("glGate")){clearInterval(iv);}
+   else if(e&&/salah|Wrong/.test(e.textContent)){clearInterval(iv);remForget();document.getElementById("glPw").value="";e.textContent=tr2("Password tersimpan sudah tidak berlaku. Masukkan password baru.","The saved password no longer works. Enter the new one.");}
+   else if(n>80)clearInterval(iv);},250);
+  pend={who:c.who,pw:c.pw,rem:true};f.requestSubmit?f.requestSubmit(go):go.click();}
+ setInterval(gateWatch,300);gateWatch();
  setInterval(ensure,700);ensure();
  try{renderStale();}catch(e){}
 })();

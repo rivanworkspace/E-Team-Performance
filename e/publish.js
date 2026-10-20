@@ -1,7 +1,7 @@
 /* Team E publish: only present when the dashboard was opened through the loader. TL mode gets a Publish box in the Update data panel. */
 (function(){
  var R=window.__TE_REMOTE;if(!R)return;
- var TK="teamE_ghtok_v1",API="https://api.github.com/repos/"+R.owner+"/"+R.repo,PATH=R.dir+"/data.json",MIN=12;
+ var TK="teamE_ghtok_v1",API="https://api.github.com/repos/"+R.owner+"/"+R.repo,PATH=R.dir+"/data.json",MIN=6,STRONG=12;
  var TOKEN=null,TOKPW=null,busy=false,lastMsg="";
  var st=document.createElement("style");
  st.textContent=".ghpub{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--line,#d5d9e4);border-radius:12px;background:var(--card,#fff)}.ghpub h4{margin:0 0 6px;font-size:13.5px}.ghpub .dpa{margin-top:8px}.ghpub input[type=password]{min-width:260px;padding:6px 8px;border:1px solid var(--line,#d5d9e4);border-radius:8px;background:transparent;color:inherit}.ghpub ol{margin:6px 0 0 18px;padding:0;font-size:12px}.ghpub details{margin-top:8px;font-size:12px}.ghpub .ok{color:var(--pos,#1a7f4b)}.ghpub .er{color:var(--neg,#c0392b)}.te-off{position:fixed;left:12px;bottom:12px;z-index:50;font-size:12px;padding:5px 10px;border-radius:999px;background:#fff4d6;color:#6b4d0f;border:1px solid #f0d58a}";
@@ -49,7 +49,7 @@
  function weak(){var w=[];if((SESSION_PW||"").length<MIN)w.push(tr2("password Data TL","TL data password"));
   if(typeof GLK!=="undefined"&&GLK.on()){var g=GLK.gpw||{};GLK.groupsOf(STORE).forEach(function(k){if(!g[k]||g[k].length<MIN)w.push(tr2("password grup ","group password ")+GLK.lbl(k));});}return w;}
  async function publish(){if(busy||!TOKEN)return;var w=weak();
-  if(w.length){msg(tr2("Publish ditahan: "+w.join(", ")+" harus minimal "+MIN+" karakter, karena data di GitHub hanya dilindungi password. Isi password baru di kotak yang sekarang terbuka, lalu klik Publish lagi.","Publish held: "+w.join(", ")+" must be at least "+MIN+" characters, since data on GitHub is protected only by passwords. Enter a new password in the box now open, then click Publish again."),"er");goPw();return;}
+  if(w.length){msg(tr2("Publish ditahan: "+w.join(", ")+" harus minimal "+MIN+" karakter. Isi password baru di kotak yang sekarang terbuka, lalu klik Publish lagi.","Publish held: "+w.join(", ")+" must be at least "+MIN+" characters. Enter a new password in the box now open, then click Publish again."),"er");goPw();return;}
   busy=true;var bt=document.getElementById("ghGo");if(bt)bt.disabled=true;
   try{msg(tr2("Menyiapkan data…","Preparing data…"));
    var at=vStamp(),ms=[...new Set(STORE.data.map(function(r){return r.month;}))].sort(),note=((document.getElementById("verNote")||{}).value||"").trim();
@@ -58,12 +58,12 @@
    await refreshPriv();var o=publicCopy();o.view="team";o.savedAt=Date.now();delete o.undo;
    var seed=o;if(typeof GLK!=="undefined"&&GLK.on())seed=await GLK.forStore(o);
    if(seed.data&&seed.data.length&&typeof GLK!=="undefined"&&GLK.on())throw new Error("data grup tidak terkunci");
-   var payload={fmt:1,at:o.savedAt,seed:seed,cb:(typeof CB_BLOB!=="undefined"?CB_BLOB:null)};
+   var payload={fmt:1,at:o.savedAt,seed:seed,cb:(typeof CB_BLOB!=="undefined"&&(SESSION_PW||"").length>=STRONG?CB_BLOB:null)};var cbOut=typeof CB_BLOB!=="undefined"&&CB_BLOB&&!payload.cb;if(cbOut){try{localStorage.setItem("teamE_cb_v1",JSON.stringify({at:Date.now(),blob:CB_BLOB}));}catch(e){}}
    try{await upload(JSON.stringify(payload),at);}catch(e){STORE.versions=prevV;STORE.dirty=prevD;throw e;}
    R.at=o.savedAt;R.local=false;
    try{var q=indexedDB.open("te_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){try{var t=q.result.transaction("kv","readwrite"),s=t.objectStore("kv");s.put(payload,"data");s.delete("localSeed");}catch(e){}};}catch(e){}
    await persist();try{renderDirty();}catch(e){}try{renderVersions();}catch(e){}try{renderHeader();}catch(e){}
-   render();msg("✓ "+tr2("Terkirim "+stamp(o.savedAt)+". Tim mendapat data ini saat membuka atau refresh dashboard (±1 menit).","Sent "+stamp(o.savedAt)+". The team gets it when they open or refresh the dashboard (about 1 minute)."),"ok");}
+   render();msg("✓ "+tr2("Terkirim "+stamp(o.savedAt)+". Tim mendapat data ini saat membuka atau refresh dashboard (±1 menit).","Sent "+stamp(o.savedAt)+". The team gets it when they open or refresh the dashboard (about 1 minute).")+(cbOut?" "+tr2("Data tab Kontak (nama & SID customer) tidak ikut dikirim karena password TL kurang dari "+STRONG+" karakter; tetap ada di Chrome ini.","Contacts tab data (customer names & SIDs) was not sent because the TL password is under "+STRONG+" characters; it stays in this Chrome."):""),"ok");}
   catch(e){var s=e&&e.status,t=String(e&&e.message||e);
    msg(s===401?tr2("Token sudah tidak berlaku. Klik Ganti token.","Token no longer valid. Click Change token."):s===403||s===404?tr2("Token tidak punya izin menulis ke repo "+R.repo+".","Token cannot write to repo "+R.repo+"."):tr2("Gagal mengirim: "+t+". Coba lagi; kalau tetap gagal, pakai Download HTML terbaru sebagai cadangan.","Send failed: "+t+". Try again; if it keeps failing, use Download latest HTML as a backup."),"er");}
   finally{busy=false;var b2=document.getElementById("ghGo");if(b2)b2.disabled=false;}}

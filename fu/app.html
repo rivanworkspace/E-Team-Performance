@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light"><head>
+<meta data-o charset="utf-8">
+<meta data-o name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta data-o name="app-version" content="0.1.0">
+<title data-o>FU & Tugas · Team E</title>
+<style data-o>
+:root{--bg:#eef2f9;--card:#fff;--card2:#f7f9fc;--line:#d5dcea;--ink:#141b2d;--mute:#5d6882;--acc:#3b5bdb;--acc2:#2e46ad;--pos:#1a7f4b;--warn:#b5760b;--neg:#c0392b;--soft:rgba(20,27,45,.05)}
+:root[data-theme="dark"]{--bg:#0b1020;--card:#141c2f;--card2:#18223a;--line:#2a3550;--ink:#f4f6fb;--mute:#8c97b0;--acc:#7c95ff;--acc2:#9db2ff;--pos:#34d08a;--warn:#e0a53a;--neg:#ff6b6b;--soft:rgba(255,255,255,.06)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--acc)}
+.wrap{max-width:960px;margin:0 auto;padding:14px 16px 60px}
+.hdr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.hdr h1{font-size:18px;margin:0;flex:1;min-width:140px}
+.hdr .who{font-size:12.5px;color:var(--mute)}
+.btn{font:inherit;font-size:13.5px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:inherit;cursor:pointer}
+.btn:hover{border-color:var(--acc)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+input,select,textarea{font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:inherit;width:100%}
+textarea{resize:vertical;min-height:62px}
+label{font-size:12.5px;color:var(--mute);display:block;margin-bottom:3px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 15px;margin-bottom:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{font:inherit;font-size:13.5px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:inherit;cursor:pointer}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.tabs button .b{display:inline-block;min-width:17px;padding:0 5px;margin-left:5px;border-radius:999px;background:var(--neg);color:#fff;font-size:11px;line-height:17px;text-align:center}
+.tabs button.on .b{background:rgba(255,255,255,.3)}
+.center{min-height:72vh;display:grid;place-items:center}
+.lbox{width:100%;max-width:380px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.row>*{flex:1;min-width:120px}
+.muted{color:var(--mute);font-size:12.5px}
+.err{color:var(--neg);font-size:12.5px;margin-top:6px;min-height:1em}
+.ok{color:var(--pos)}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--soft)}
+.pill.due{background:#fdebe9;color:var(--neg)}.pill.today{background:#fff4de;color:var(--warn)}.pill.up{background:#e8f0ff;color:var(--acc)}.pill.done{background:#e3f4ec;color:var(--pos)}
+:root[data-theme="dark"] .pill.due{background:rgba(255,107,107,.18)}:root[data-theme="dark"] .pill.today{background:rgba(224,165,58,.18)}:root[data-theme="dark"] .pill.up{background:rgba(124,149,255,.18)}:root[data-theme="dark"] .pill.done{background:rgba(52,208,138,.18)}
+.item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--card2)}
+.item.d{opacity:.6}
+.item h4{margin:0 0 3px;font-size:14px}
+.item .meta{font-size:12px;color:var(--mute);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.item .txt{font-size:13.5px;margin:5px 0;white-space:pre-wrap}
+.iact{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.empty{text-align:center;color:var(--mute);padding:26px 10px;font-size:13.5px}
+.search{margin-bottom:10px}
+.clist{max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.crow{display:flex;gap:10px;align-items:center;padding:8px 11px;border-bottom:1px solid var(--line);cursor:pointer}
+.crow:last-child{border-bottom:0}.crow:hover{background:var(--soft)}
+.crow .nm{flex:1;font-size:13.5px}.crow .sid{font-size:11.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.crow.sel{background:var(--soft)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 15px;border-radius:999px;font-size:13px;z-index:90;max-width:90vw}
+.off{position:fixed;left:12px;bottom:12px;z-index:50;font-size:12px;padding:5px 10px;border-radius:999px;background:#fff4d6;color:#6b4d0f;border:1px solid #f0d58a}
+.banner{background:#fff7e6;border:1px solid #f3dfb1;color:#6b4d0f;border-radius:11px;padding:10px 13px;margin-bottom:12px;font-size:13.5px}
+:root[data-theme="dark"] .banner{background:rgba(224,165,58,.12);color:var(--warn);border-color:rgba(224,165,58,.4)}
+.banner b{display:block;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.grid2{grid-template-columns:1fr}}
+.linkcard{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px;background:var(--card2);text-decoration:none;color:inherit}
+.linkcard:hover{border-color:var(--acc)}
+.linkcard .ic{font-size:20px}.linkcard .t{flex:1}.linkcard .t b{display:block;font-size:14px}.linkcard .t span{font-size:12px;color:var(--mute)}
+.chk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink)}
+.chk input{width:auto}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.sub{font-size:12.5px;color:var(--mute);margin:-4px 0 10px}
+</style>
+</head>
+<body>
+<div data-o id="root" class="wrap"><div class="center"><div class="muted">Memuat…</div></div></div>
+<noscript data-o>Alat ini perlu JavaScript. Buka di Google Chrome.</noscript>
+<script data-o type="application/json" id="cfgseed">null</script>
+<script data-o type="application/json" id="noteseed">{}</script>
+<script data-o>
+/* FU & Tugas Team E — core. Data model & crypto described in README of E-Team-Tasks-Reminder. */
+"use strict";
+const R=window.__FU_REMOTE||{owner:"",repo:"",dir:"fu",dataRepo:"E-Team-Tasks-Reminder",sha:null,offline:false,ver:"0.0.0"};
+const TEAM=window.__FU_TEAM||{leader:"Rivan",members:["Atika","Darwin","Dilah","Jusep","Dimas","Duta"]};
+const $=s=>document.querySelector(s),el=(t,a,h)=>{const e=document.createElement(t);if(a)for(const k in a)k==="class"?e.className=a[k]:k==="html"?e.innerHTML=a[k]:e.setAttribute(k,a[k]);if(h!=null)e.textContent=h;return e;};
+const te=new TextEncoder(),td=new TextDecoder();
+const b64=b=>{const a=new Uint8Array(b);let s="";for(let i=0;i<a.length;i+=8192)s+=String.fromCharCode.apply(null,a.subarray(i,i+8192));return btoa(s);};
+const ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+const sha256=async s=>b64(await crypto.subtle.digest("SHA-256",te.encode(s)));
+/* ---- crypto: PBKDF2 for passwords, raw AES keys wrapped as data ---- */
+async function pkey(pw,salt){const b=await crypto.subtle.importKey("raw",te.encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:150000,hash:"SHA-256"},b,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
+async function encWith(key,bytes){const iv=rnd(12);const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,bytes);return {iv:b64(iv),ct:b64(ct)};}
+async function decWith(key,e){const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:ub64(e.iv)},key,ub64(e.ct));return new Uint8Array(pt);}
+async function encPw(pw,bytes){const salt=rnd(16),k=await pkey(pw,salt),e=await encWith(k,bytes);return {salt:b64(salt),iv:e.iv,ct:e.ct};}
+async function decPw(pw,e){const k=await pkey(pw,ub64(e.salt));return decWith(k,{iv:e.iv,ct:e.ct});}
+async function rawKey(){return crypto.subtle.exportKey("raw",await crypto.subtle.generateKey({name:"AES-GCM",length:256},true,["encrypt","decrypt"]));}
+async function impKey(raw){return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt","decrypt"]);}
+async function encJSON(key,obj){return encWith(key,te.encode(JSON.stringify(obj)));}
+async function decJSON(key,e){return JSON.parse(td.decode(await decWith(key,e)));}
+
+let CFG=null;        /* published team config (accounts, keys, seeded customers, tasks, links) */
+let NOTES={};        /* raw note files loaded: {name: {obj, enc}} */
+let ME=null;         /* {name, isTL, Km(CryptoKey)|null, Kteam(CryptoKey), Kmaster(CryptoKey)|null, pw} */
+let TAB="fu", SELC=null, BOOTED=false;
+
+try{CFG=JSON.parse($("#cfgseed").textContent);}catch(e){CFG=null;}
+try{NOTES=JSON.parse($("#noteseed").textContent)||{};}catch(e){NOTES={};}
+
+/* ================= rendering ================= */
+function toast(t){const n=el("div",{class:"toast"},t);document.body.appendChild(n);setTimeout(()=>n.remove(),2600);}
+function fmtDue(ms){if(!ms)return "";const d=new Date(ms),now=new Date(),day=864e5;const d0=new Date(d.getFullYear(),d.getMonth(),d.getDate()),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());const diff=Math.round((d0-t0)/day);const hhmm=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");const lbl=d.toLocaleDateString("id-ID",{day:"numeric",month:"short"});return {lbl,hhmm,diff,ms};}
+function dueState(ms){if(!ms)return null;const f=fmtDue(ms);if(ms<Date.now())return "due";if(f.diff===0)return "today";return "up";}
+function render(){const r=$("#root");r.innerHTML="";if(!ME){return;}
+ r.appendChild(hdr());
+ const due=dueItems();
+ if(due.length){const b=el("div",{class:"banner"});b.appendChild(el("b",null,"⏰ Perlu tindakan sekarang ("+due.length+")"));
+  due.slice(0,6).forEach(x=>{const row=el("div",null);row.textContent="• "+x.label;b.appendChild(row);});
+  if(due.length>6)b.appendChild(el("div",{class:"muted"},"…dan "+(due.length-6)+" lagi"));
+  r.appendChild(b);}
+ r.appendChild(tabsBar());
+ const body=el("div");r.appendChild(body);
+ if(TAB==="fu")fuTab(body);else if(TAB==="task")taskTab(body);else if(TAB==="link")linkTab(body);else if(TAB==="tl")tlTab(body);
+ updateBadges();
+}
+function hdr(){const h=el("div",{class:"hdr"});h.appendChild(el("h1",null,"FU & Tugas"));
+ h.appendChild(el("div",{class:"who"},(ME.isTL?"TL · ":"")+ME.name+(R.offline?" · offline":"")));
+ const t=el("button",{class:"btn sm ghost"},document.documentElement.dataset.theme==="dark"?"☀︎":"☾");t.onclick=()=>{const m=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=m;try{localStorage.setItem("fuTheme",m)}catch(e){}t.textContent=m==="dark"?"☀︎":"☾";};h.appendChild(t);
+ const nb=el("button",{class:"btn sm ghost",title:"Izinkan notifikasi Chrome"},"🔔");nb.onclick=askNotif;h.appendChild(nb);
+ const lo=el("button",{class:"btn sm ghost"},"Keluar");lo.onclick=logout;h.appendChild(lo);
+ return h;}
+function tabsBar(){const t=el("div",{class:"tabs"});
+ const defs=[["fu","Follow-up"],["task","Tugas"],["link","Lark"]];if(ME.isTL)defs.push(["tl","Kelola"]);
+ defs.forEach(([k,l])=>{const b=el("button",{class:TAB===k?"on":""});b.appendChild(document.createTextNode(l));b.dataset.k=k;b.onclick=()=>{TAB=k;SELC=null;render();};t.appendChild(b);});
+ return t;}
+function updateBadges(){const c=counts();document.querySelectorAll(".tabs button").forEach(b=>{const k=b.dataset.k;const n=k==="fu"?c.fu:k==="task"?c.task:0;b.querySelectorAll(".b").forEach(x=>x.remove());if(n)b.appendChild(el("span",{class:"b"},String(n)));});
+ const total=c.fu+c.task;document.title=(total?"("+total+") ":"")+"FU & Tugas · Team E";setFavBadge(total);}
+
+/* ================= data helpers ================= */
+function myNotes(name){name=name||ME.name;const n=NOTES[name]&&NOTES[name].obj;return n||{fu:[],status:{},at:0};}
+function targets(){/* which members' data ME can see */return ME.isTL?[ME.name].concat(TEAM.members.filter(m=>m!==ME.name)).filter((v,i,a)=>a.indexOf(v)===i):[ME.name];}
+function myCustomers(name){name=name||ME.name;return (CFG&&CFG._cust&&CFG._cust[name])||[];}
+function allTasksFor(name){name=name||ME.name;const ts=(CFG&&CFG._tasks)||[];return ts.filter(t=>ME.isTL||t.to==="ALL"||t.to===name||(Array.isArray(t.to)&&t.to.indexOf(name)>=0));}
+function taskDone(name,id){const st=myNotes(name).status||{};return !!st[id];}
+function counts(){let fu=0,task=0;const nm=ME.name;myNotes(nm).fu.forEach(f=>{if(!f.done&&f.due&&f.due<Date.now()+864e5)fu++;});allTasksFor(nm).forEach(t=>{if(!taskDone(nm,t.id)&&(!t.due||t.due<Date.now()+864e5))task++;});return {fu,task};}
+function dueItems(){const out=[],nm=ME.name;myNotes(nm).fu.forEach(f=>{if(!f.done&&f.due&&f.due<=Date.now()){out.push({label:"FU "+(f.cust||"")+": "+f.text.slice(0,40),ms:f.due});}});allTasksFor(nm).forEach(t=>{if(!taskDone(nm,t.id)&&t.due&&t.due<=Date.now())out.push({label:"Tugas: "+t.title,ms:t.due});});return out.sort((a,b)=>a.ms-b.ms);}
+
+/* ================= FU tab ================= */
+function fuTab(root){
+ const nm=ME.name;
+ if(ME.isTL){const pick=el("div",{class:"card"});pick.appendChild(el("label",null,"Lihat follow-up milik"));
+  const sel=el("select");targets().forEach(m=>sel.appendChild(el("option",{value:m},m===ME.name?m+" (saya)":m)));sel.value=viewName();sel.onchange=()=>{VIEW=sel.value;render();};pick.appendChild(sel);root.appendChild(pick);}
+ const who=viewName();
+ const add=el("div",{class:"card"});add.appendChild(el("b",null,"Tambah follow-up"+(who!==nm?" untuk "+who:"")));
+ const ca=el("div",{class:"row",style:"margin-top:8px"});
+ const cust=el("input",{placeholder:"Nama / SID customer (opsional)",id:"fuCust"});
+ const pickBtn=el("button",{class:"btn sm"},"Pilih dari daftar");pickBtn.onclick=()=>openCustPicker(v=>{cust.value=v;});
+ const cwrap=el("div");cwrap.style.flex="2";cwrap.appendChild(el("label",null,"Customer"));cwrap.appendChild(cust);
+ const pwrap=el("div");pwrap.style.flex="0 0 auto";pwrap.appendChild(el("label",null,"​"));pwrap.appendChild(pickBtn);
+ ca.appendChild(cwrap);ca.appendChild(pwrap);add.appendChild(ca);
+ const txt=el("textarea",{placeholder:"Catatan follow-up — mis. telepon lagi soal deposit",id:"fuTxt"});add.appendChild(el("label",{style:"margin-top:8px"},"Catatan"));add.appendChild(txt);
+ const dr=el("div",{class:"row",style:"margin-top:8px"});
+ const dd=el("div");dd.appendChild(el("label",null,"Ingatkan (opsional)"));const din=el("input",{type:"datetime-local",id:"fuDue"});dd.appendChild(din);
+ const bd=el("div",{style:"flex:0 0 auto"});bd.appendChild(el("label",null,"​"));const sv=el("button",{class:"btn primary"},"Simpan");bd.appendChild(sv);
+ dr.appendChild(dd);dr.appendChild(bd);add.appendChild(dr);
+ const er=el("div",{class:"err",id:"fuErr"});add.appendChild(er);
+ sv.onclick=async()=>{const t=txt.value.trim();if(!t){er.textContent="Isi catatannya dulu.";return;}
+  const due=din.value?new Date(din.value).getTime():0;const f={id:"f"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),cust:cust.value.trim(),text:t,due,done:false,at:Date.now()};
+  const n=myNotes(who);n.fu.unshift(f);await saveNotes(who,n,"FU ditambah");render();};
+ root.appendChild(add);
+ const list=el("div");const items=myNotes(who).fu.slice().sort((a,b)=>(a.done-b.done)||((a.due||9e15)-(b.due||9e15)));
+ if(!items.length)list.appendChild(el("div",{class:"empty"},"Belum ada follow-up."));
+ items.forEach(f=>list.appendChild(fuItem(who,f)));root.appendChild(list);
+}
+function fuItem(who,f){const it=el("div",{class:"item"+(f.done?" d":"")});
+ const h=el("h4",null,f.cust||"(tanpa customer)");it.appendChild(h);
+ const meta=el("div",{class:"meta"});if(f.due){const ds=dueState(f.due),fd=fmtDue(f.due);meta.appendChild(el("span",{class:"pill "+(f.done?"done":ds)},(f.done?"selesai":ds==="due"?"lewat":ds==="today"?"hari ini":"dijadwal")+" · "+fd.lbl+" "+fd.hhmm));}
+ if(f.done)meta.appendChild(el("span",{class:"pill done"},"selesai"));it.appendChild(meta);
+ it.appendChild(el("div",{class:"txt"},f.text));
+ const act=el("div",{class:"iact"});
+ const dn=el("button",{class:"btn sm"},f.done?"Buka lagi":"✓ Selesai");dn.onclick=async()=>{f.done=!f.done;await saveNotes(who,myNotes(who),"");render();};
+ const sn=el("button",{class:"btn sm ghost"},"Tunda 1 hari");sn.onclick=async()=>{f.due=(f.due||Date.now())+864e5;f.done=false;await saveNotes(who,myNotes(who),"");render();};
+ const del=el("button",{class:"btn sm ghost"},"Hapus");del.onclick=async()=>{if(!confirm("Hapus follow-up ini?"))return;const n=myNotes(who);n.fu=n.fu.filter(x=>x.id!==f.id);await saveNotes(who,n,"");render();};
+ act.appendChild(dn);if(f.due||!f.done)act.appendChild(sn);act.appendChild(del);it.appendChild(act);return it;}
+
+/* ================= Tasks tab ================= */
+function taskTab(root){const nm=ME.name;const who=ME.isTL?viewName():nm;
+ if(ME.isTL){const pick=el("div",{class:"card"});pick.appendChild(el("label",null,"Lihat status tugas milik"));
+  const sel=el("select");targets().forEach(m=>sel.appendChild(el("option",{value:m},m===ME.name?m+" (saya)":m)));sel.value=who;sel.onchange=()=>{VIEW=sel.value;render();};pick.appendChild(sel);root.appendChild(pick);}
+ const ts=allTasksFor(who).slice().sort((a,b)=>(taskDone(who,a.id)-taskDone(who,b.id))||((a.due||9e15)-(b.due||9e15)));
+ if(!ts.length){root.appendChild(el("div",{class:"empty"},ME.isTL?"Belum ada tugas. Buat di tab Kelola.":"Belum ada tugas dari TL."));return;}
+ ts.forEach(t=>{const done=taskDone(who,t.id);const it=el("div",{class:"item"+(done?" d":"")});
+  it.appendChild(el("h4",null,t.title));
+  const meta=el("div",{class:"meta"});meta.appendChild(el("span",{class:"pill"},"dari "+(t.by||"TL")));
+  if(t.to!=="ALL"&&ME.isTL)meta.appendChild(el("span",{class:"pill"},"untuk "+(Array.isArray(t.to)?t.to.join(", "):t.to)));
+  if(t.to==="ALL")meta.appendChild(el("span",{class:"pill"},"semua"));
+  if(t.due){const ds=dueState(t.due),fd=fmtDue(t.due);meta.appendChild(el("span",{class:"pill "+(done?"done":ds)},(done?"selesai":ds==="due"?"lewat":ds==="today"?"hari ini":"dijadwal")+" · "+fd.lbl+" "+fd.hhmm));}
+  it.appendChild(meta);
+  if(t.detail)it.appendChild(el("div",{class:"txt"},t.detail));
+  const act=el("div",{class:"iact"});
+  if(!ME.isTL||who===nm){const dn=el("button",{class:"btn sm"+(done?"":" primary")},done?"Buka lagi":"✓ Selesai");dn.onclick=async()=>{const n=myNotes(who);n.status=n.status||{};n.status[t.id]=!done;await saveNotes(who,n,"");render();};act.appendChild(dn);}
+  else{act.appendChild(el("span",{class:"muted"},done?"✓ sudah dikerjakan":"belum dikerjakan"));}
+  it.appendChild(act);root.appendChild(it);});
+}
+
+/* ================= Lark links tab ================= */
+function linkTab(root){const links=(CFG&&CFG._links)||[];
+ root.appendChild(el("div",{class:"sub"},"Dokumen Lark untuk dikerjakan. Klik untuk membuka (perlu login Lark)."));
+ if(!links.length){root.appendChild(el("div",{class:"empty"},ME.isTL?"Belum ada link. Tambah di tab Kelola.":"Belum ada dokumen dari TL."));return;}
+ links.forEach(l=>{const a=el("a",{class:"linkcard",href:l.url,target:"_blank",rel:"noopener"});a.appendChild(el("div",{class:"ic"},l.icon||"📄"));
+  const t=el("div",{class:"t"});t.appendChild(el("b",null,l.title||l.url));if(l.note)t.appendChild(el("span",null,l.note));a.appendChild(t);a.appendChild(el("div",{class:"muted"},"Buka ↗"));root.appendChild(a);});
+}
+
+/* ================= TL manage tab ================= */
+function tlTab(root){
+ /* publish state */
+ const pb=el("div",{class:"card"});pb.appendChild(el("b",null,"☁️ Publish perubahan ke tim"));
+ pb.appendChild(el("div",{class:"sub",html:"Tugas, link Lark, dan daftar customer dikirim lewat Publish. Catatan follow-up tiap sales tersimpan otomatis saat mereka menyimpan."}));
+ const pbtn=el("button",{class:"btn primary"},"Publish");const pmsg=el("span",{class:"muted",id:"tlPubMsg",style:"margin-left:10px"});
+ pbtn.onclick=()=>publishConfig(pmsg);pb.appendChild(pbtn);pb.appendChild(pmsg);root.appendChild(pb);
+
+ /* assign task */
+ const at=el("div",{class:"card"});at.appendChild(el("b",null,"Beri tugas"));
+ const ti=el("input",{placeholder:"Judul tugas",id:"tTitle"});at.appendChild(el("label",{style:"margin-top:8px"},"Judul"));at.appendChild(ti);
+ const de=el("textarea",{placeholder:"Keterangan (opsional)",id:"tDetail"});at.appendChild(el("label",{style:"margin-top:8px"},"Keterangan"));at.appendChild(de);
+ const r2=el("div",{class:"row",style:"margin-top:8px"});
+ const aw=el("div");aw.appendChild(el("label",null,"Untuk"));const asel=el("select",{id:"tTo"});asel.appendChild(el("option",{value:"ALL"},"Semua anggota"));TEAM.members.forEach(m=>asel.appendChild(el("option",{value:m},m)));aw.appendChild(asel);
+ const dw=el("div");dw.appendChild(el("label",null,"Tenggat (opsional)"));const ddl=el("input",{type:"datetime-local",id:"tDue"});dw.appendChild(ddl);
+ const bw=el("div",{style:"flex:0 0 auto"});bw.appendChild(el("label",null,"​"));const ab=el("button",{class:"btn primary"},"Tambah tugas");bw.appendChild(ab);
+ r2.appendChild(aw);r2.appendChild(dw);r2.appendChild(bw);at.appendChild(r2);
+ ab.onclick=()=>{const t=ti.value.trim();if(!t){toast("Isi judul tugas.");return;}CFG._tasks=CFG._tasks||[];CFG._tasks.unshift({id:"t"+Date.now().toString(36),title:t,detail:de.value.trim(),to:asel.value,by:ME.name,due:ddl.value?new Date(ddl.value).getTime():0,at:Date.now()});ti.value="";de.value="";ddl.value="";markDirty();render();TAB="tl";};
+ const tl=el("div");(CFG._tasks||[]).forEach(t=>{const it=el("div",{class:"item"});it.appendChild(el("h4",null,t.title));it.appendChild(el("div",{class:"meta",html:'<span class="pill">untuk '+(Array.isArray(t.to)?t.to.join(", "):t.to==="ALL"?"semua":t.to)+'</span>'+(t.due?'<span class="pill up">'+fmtDue(t.due).lbl+'</span>':'')}));
+  const del=el("button",{class:"btn sm ghost"},"Hapus tugas");del.onclick=()=>{if(!confirm("Hapus tugas ini untuk semua?"))return;CFG._tasks=CFG._tasks.filter(x=>x.id!==t.id);markDirty();render();TAB="tl";};const act=el("div",{class:"iact"});act.appendChild(del);it.appendChild(act);tl.appendChild(it);});
+ at.appendChild(tl);root.appendChild(at);
+
+ /* lark links */
+ const lk=el("div",{class:"card"});lk.appendChild(el("b",null,"Link dokumen Lark"));
+ const l2=el("div",{class:"row",style:"margin-top:8px"});
+ const lt=el("div",{style:"flex:2"});lt.appendChild(el("label",null,"Judul"));const lti=el("input",{id:"lTitle",placeholder:"mis. Input Harian Oktober"});lt.appendChild(lti);
+ const lu=el("div",{style:"flex:3"});lu.appendChild(el("label",null,"URL Lark"));const lui=el("input",{id:"lUrl",placeholder:"https://…lark…"});lu.appendChild(lui);
+ const lb=el("div",{style:"flex:0 0 auto"});lb.appendChild(el("label",null,"​"));const lab=el("button",{class:"btn primary"},"Tambah");lb.appendChild(lab);
+ l2.appendChild(lt);l2.appendChild(lu);l2.appendChild(lb);lk.appendChild(l2);
+ lab.onclick=()=>{const u=lui.value.trim();if(!/^https?:\/\//.test(u)){toast("URL harus diawali https://");return;}CFG._links=CFG._links||[];CFG._links.push({id:"l"+Date.now().toString(36),title:lti.value.trim()||u,url:u,icon:"📄"});lti.value="";lui.value="";markDirty();render();TAB="tl";};
+ (CFG._links||[]).forEach(l=>{const it=el("div",{class:"item"});it.appendChild(el("h4",null,l.title));it.appendChild(el("div",{class:"meta"},l.url));const del=el("button",{class:"btn sm ghost"},"Hapus");del.onclick=()=>{CFG._links=CFG._links.filter(x=>x.id!==l.id);markDirty();render();TAB="tl";};const act=el("div",{class:"iact"});act.appendChild(del);it.appendChild(act);lk.appendChild(it);});
+ root.appendChild(lk);
+
+ /* members: enrollment codes & reset */
+ const mb=el("div",{class:"card"});mb.appendChild(el("b",null,"Anggota & kode aktivasi"));
+ mb.appendChild(el("div",{class:"sub",html:"Anggota membuat password sendiri. Beri kode aktivasi ini supaya mereka bisa masuk pertama kali. Untuk reset password yang lupa, buat kode baru dan berikan ke anggota itu."}));
+ TEAM.members.forEach(m=>{const row=el("div",{class:"row",style:"margin-bottom:6px;align-items:center"});
+  const st=CFG.acct&&CFG.acct[m];const enrolled=!!ENROLLED[m];
+  const nmw=el("div",{style:"flex:1"});nmw.appendChild(el("b",null,m));nmw.appendChild(document.createTextNode(" "));nmw.appendChild(el("span",{class:"pill "+(enrolled?"done":"up")},enrolled?"sudah set password":"belum aktivasi"));
+  const codew=el("div",{style:"flex:1"});const cv=el("input",{readonly:"",placeholder:"— klik Buat kode —",value:(st&&st._plainCode)||""});codew.appendChild(cv);
+  const bw2=el("div",{style:"flex:0 0 auto"});const gen=el("button",{class:"btn sm"},enrolled?"Reset (kode baru)":"Buat kode");gen.onclick=async()=>{const code=newCode();CFG.acct=CFG.acct||{};const a=CFG.acct[m]||{};a.actHash=await sha256(code+"|"+m);a._plainCode=code;a.ver=null;a.km_pw=null;a.resetAt=Date.now();CFG.acct[m]=a;markDirty();render();TAB="tl";toast("Kode untuk "+m+": "+code);};bw2.appendChild(gen);
+  row.appendChild(nmw);row.appendChild(codew);row.appendChild(bw2);mb.appendChild(row);});
+ root.appendChild(mb);
+
+ /* seed customers + shared token (collapsed advanced) */
+ const adv=el("details",{class:"card"});adv.appendChild(el("summary",null,"Pengaturan lanjutan (token & data customer)"));
+ const sw=el("div",{style:"margin-top:10px"});
+ sw.appendChild(el("label",null,"Token GitHub untuk repo data ("+R.dataRepo+")"));
+ const tokHas=!!(CFG&&CFG._tokenSet);
+ const tin=el("input",{type:"password",placeholder:tokHas?"✓ sudah diisi — isi untuk mengganti":"github_pat_…",id:"shTok"});sw.appendChild(tin);
+ sw.appendChild(el("div",{class:"sub",html:"Token ini dipakai alat untuk menyimpan catatan & status tugas ke repo data. Dibuat khusus repo "+R.dataRepo+" saja (Contents: Read and write). Disimpan terenkripsi di dalam data tim."}));
+ const stb=el("button",{class:"btn sm"},"Simpan token");stb.onclick=async()=>{const v=tin.value.trim();if(v&&!/^github_pat_/.test(v)){toast("Token fine-grained diawali github_pat_");return;}if(v){CFG._tokenPlain=v;CFG._tokenSet=true;markDirty();tin.value="";toast("Token disimpan. Klik Publish untuk mengirim.");}};sw.appendChild(stb);
+ sw.appendChild(el("hr"));
+ sw.appendChild(el("label",null,"Data customer per sales (dari dashboard)"));
+ sw.appendChild(el("div",{class:"sub"},"Daftar customer tiap sales diambil dari file dashboard. Muat ulang kalau ada customer baru."));
+ const cin=el("input",{type:"file",accept:".html,text/html",id:"custFile"});sw.appendChild(cin);
+ const cmsg=el("div",{class:"muted",id:"custMsg",style:"margin-top:6px"});sw.appendChild(cmsg);
+ cin.onchange=ev=>seedCustomers(ev.target.files[0],cmsg);
+ adv.appendChild(sw);root.appendChild(adv);
+}
+
+let VIEW=null;function viewName(){return (ME.isTL&&VIEW)||ME.name;}
+
+/* ================= GitHub data I/O (repo E-Team-Tasks-Reminder) ================= */
+const API="https://api.github.com/repos/"+R.dataRepo+"/contents/data/";
+const RAWD=p=>(R.dataBase||("https://raw.githubusercontent.com/"+R.dataRepo+"/main/data/"))+p+(R.sha?"":"?t="+Date.now());
+let REPO_TOKEN=null;
+async function ghGetSha(path){try{const r=await fetch(API+path,{headers:gh(),cache:"no-store"});if(r.status===404)return null;if(!r.ok)return null;const j=await r.json();return j.sha||null;}catch(e){return null;}}
+function gh(){const h={Accept:"application/vnd.github+json"};if(REPO_TOKEN)h.Authorization="Bearer "+REPO_TOKEN;return h;}
+async function ghPut(path,obj,msg){if(!REPO_TOKEN)throw new Error("Token belum diatur oleh TL.");
+ for(let i=0;i<3;i++){const sha=await ghGetSha(path);const body={message:msg||("update "+path),content:b64(te.encode(JSON.stringify(obj))),branch:"main"};if(sha)body.sha=sha;
+  const r=await fetch(API+path,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},gh()),body:JSON.stringify(body)});
+  if(r.ok)return true;let j=null;try{j=await r.json();}catch(e){}if(r.status===409&&i<2)continue;const e=new Error((j&&j.message)||("HTTP "+r.status));e.status=r.status;throw e;}}
+async function fetchNotesFile(name){try{const r=await fetch(RAWD("notes/"+encodeURIComponent(name)+".json"),{cache:"no-store"});if(!r.ok)return null;return await r.json();}catch(e){return null;}}
+
+/* ================= keys & accounts ================= */
+async function codeKey(code,name){return pkey(code.trim().toUpperCase(),te.encode("fu-code|"+name));}
+function newCode(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";const b=rnd(8);for(let i=0;i<8;i++)s+=A[b[i]%A.length];return s.slice(0,4)+"-"+s.slice(4);}
+async function rsaEnc(spki,bytes){const k=await crypto.subtle.importKey("spki",ub64(spki),{name:"RSA-OAEP",hash:"SHA-256"},false,["encrypt"]);return b64(await crypto.subtle.encrypt({name:"RSA-OAEP"},k,bytes));}
+async function rsaDec(pkcs8,ct){const k=await crypto.subtle.importKey("pkcs8",pkcs8,{name:"RSA-OAEP",hash:"SHA-256"},false,["decrypt"]);return new Uint8Array(await crypto.subtle.decrypt({name:"RSA-OAEP"},k,ub64(ct)));}
+
+/* decrypt the published config's shared parts once keys are known */
+async function loadShared(kteam){CFG._tasks=[];CFG._links=[];
+ try{if(CFG.tasks)CFG._tasks=await decJSON(kteam,CFG.tasks);}catch(e){}
+ try{if(CFG.links)CFG._links=await decJSON(kteam,CFG.links);}catch(e){}}
+
+/* ----- TL first-run setup: generate keypair + team key, publish empty config ----- */
+async function tlSetup(pw,token){
+ const kp=await crypto.subtle.generateKey({name:"RSA-OAEP",modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:"SHA-256"},true,["encrypt","decrypt"]);
+ const pk=b64(await crypto.subtle.exportKey("spki",kp.publicKey));
+ const sk=b64(await crypto.subtle.exportKey("pkcs8",kp.privateKey));
+ const kteamRaw=rnd(32),kteam=await impKey(kteamRaw);
+ REPO_TOKEN=token;
+ const vault={sk,kteam:b64(kteamRaw),repoToken:token,custRaw:{}};
+ ME={name:TEAM.leader,isTL:true,kteam,kteamRaw,sk:ub64(sk),pw,vault};
+ CFG={fmt:1,pk,acct:{},cust:{},_tasks:[],_links:[]};
+ const out={fmt:1,at:Date.now(),pk,vault:await encPw(pw,te.encode(JSON.stringify(vault))),_tokenSet:true,acct:{},cust:{},tasks:await encJSON(kteam,[]),links:await encJSON(kteam,[])};
+ await ghPut("config.json",out,"init FU config");
+ Object.assign(CFG,{vault:out.vault});CFG._cust={};NOTES={};saveLocal();
+}
+
+/* ----- TL login ----- */
+async function tlLogin(pw){
+ if(!CFG||!CFG.vault)throw {code:"nocfg"};
+ let vault;try{vault=JSON.parse(td.decode(await decPw(pw,CFG.vault)));}catch(e){throw {code:"badpw"};}
+ const kteamRaw=ub64(vault.kteam),kteam=await impKey(kteamRaw);
+ REPO_TOKEN=vault.repoToken||null;
+ ME={name:TEAM.leader,isTL:true,kteam,kteamRaw,sk:ub64(vault.sk),pw,vault};
+ await loadShared(kteam);
+ /* customers for TL shown per member via vault.custRaw */
+ CFG._cust={};for(const nm in (vault.custRaw||{}))CFG._cust[nm]=vault.custRaw[nm];
+ /* pull every member notes file so TL sees FU + task status */
+ NOTES={};await Promise.all(TEAM.members.concat([TEAM.leader]).map(async nm=>{const f=await fetchNotesFile(nm);if(f)await ingestNotesTL(nm,f);}));
+ /* mark enrolled accounts & let TL read member names list */
+ CFG.acct=CFG.acct||{};
+}
+async function ingestNotesTL(nm,f){try{if(nm===TEAM.leader){/* TL own notes under kteam */const obj=f.data?await decJSON(ME.kteam,f.data):{fu:[],status:{}};NOTES[nm]={obj,enc:f};return;}
+  if(!f.acct||!f.acct.kmTl)return;const kmRaw=await rsaDec(ME.sk,f.acct.kmTl);const km=await impKey(kmRaw);const obj=f.data?await decJSON(km,f.data):{fu:[],status:{}};NOTES[nm]={obj,enc:f,km,kmRaw};}catch(e){}}
+
+/* ----- member login ----- */
+async function memberLogin(name,pw){
+ const f=await fetchNotesFile(name)||NOTES[name]&&NOTES[name].enc;
+ if(!f||!f.acct||!f.acct.kmPw)throw {code:"needenroll"};
+ let kmRaw;try{kmRaw=await decPw(pw,f.acct.kmPw);}catch(e){throw {code:"badpw"};}
+ const km=await impKey(kmRaw);const kteamRaw=await decPw(pw,f.acct.kteamPw);const kteam=await impKey(kteamRaw);
+ REPO_TOKEN=td.decode(await decWith(km,f.acct.tok));
+ ME={name,isTL:false,km,kmRaw,kteam,kteamRaw,pw};
+ const obj=f.data?await decJSON(km,f.data):{fu:[],status:{}};NOTES[name]={obj,enc:f,km,kmRaw};
+ CFG._cust={};try{if(CFG.cust&&CFG.cust[name])CFG._cust[name]=await decJSON(km,CFG.cust[name]);}catch(e){}
+ await loadShared(kteam);
+}
+
+/* ----- member enrollment (first login / after reset) ----- */
+async function enroll(name,code,pw){
+ const a=CFG&&CFG.acct&&CFG.acct[name];if(!a||!a.actHash)throw {code:"nocode"};
+ if((await sha256(code.trim().toUpperCase()+"|"+name))!==a.actHash)throw {code:"badcode"};
+ const ck=await codeKey(code,name);let kteamRaw,repoToken;
+ try{kteamRaw=await decWith(ck,a.wrapKteam);repoToken=td.decode(await decWith(ck,a.wrapTok));}catch(e){throw {code:"badcode"};}
+ const kmr=rnd(32),km=await impKey(kmr);
+ const kmTl=await rsaEnc(CFG.pk,kmr);
+ const tok=await encWith(km,te.encode(repoToken));
+ const acct={kmPw:await encPw(pw,kmr),kteamPw:await encPw(pw,kteamRaw),tok,kmTl,enrolledAt:Date.now()};
+ const data=await encJSON(km,{fu:[],status:{}});
+ const file={fmt:1,at:Date.now(),acct,data};
+ REPO_TOKEN=repoToken;
+ await ghPut("notes/"+encodeURIComponent(name)+".json",file,"enroll "+name);
+ NOTES[name]={obj:{fu:[],status:{}},enc:file,km,kmRaw:kmr};
+ ME={name,isTL:false,km,kmRaw:kmr,kteam:await impKey(kteamRaw),kteamRaw,pw};
+ CFG._cust={};try{if(CFG.cust&&CFG.cust[name])CFG._cust[name]=await decJSON(km,CFG.cust[name]);}catch(e){}
+ await loadShared(ME.kteam);
+}
+
+/* ================= saving ================= */
+async function saveNotes(name,obj,note){obj.at=Date.now();NOTES[name]=NOTES[name]||{};NOTES[name].obj=obj;
+ const key=name===TEAM.leader?ME.kteam:(NOTES[name].km||ME.km);
+ const f=NOTES[name].enc||{fmt:1,acct:(NOTES[name].enc&&NOTES[name].enc.acct)||null};
+ f.data=await encJSON(key,obj);f.at=obj.at;NOTES[name].enc=f;
+ saveLocal();
+ if(R.offline||!REPO_TOKEN){toast("Tersimpan di perangkat ini (offline).");return;}
+ try{await ghPut("notes/"+encodeURIComponent(name)+".json",f,note||("update "+name));}catch(e){toast("Gagal sinkron: "+(e.message||e)+" — tersimpan lokal.");}
+}
+let DIRTY=false;function markDirty(){DIRTY=true;const m=$("#tlPubMsg");if(m)m.textContent="Ada perubahan belum di-publish.";}
+async function publishConfig(msgEl){if(!ME.isTL)return;
+ if(msgEl)msgEl.textContent="Menyiapkan…";
+ try{
+  /* rebuild vault with latest custRaw, token, tasks/links under kteam */
+  const vault={sk:b64(ME.sk),kteam:b64(ME.kteamRaw),repoToken:REPO_TOKEN||ME.vault.repoToken,custRaw:ME.vault.custRaw||{}};
+  if(CFG._tokenPlain){vault.repoToken=CFG._tokenPlain;REPO_TOKEN=CFG._tokenPlain;CFG._tokenPlain=null;}
+  const out={fmt:1,at:Date.now(),pk:CFG.pk,vault:await encPw(ME.pw,te.encode(JSON.stringify(vault))),_tokenSet:!!vault.repoToken,
+   acct:CFG.acct||{},cust:{},tasks:await encJSON(ME.kteam,CFG._tasks||[]),links:await encJSON(ME.kteam,CFG._links||[])};
+  /* re-wrap code secrets for any pending accounts */
+  for(const nm in (CFG.acct||{})){const a=CFG.acct[nm];if(a._plainCode){const ck=await codeKey(a._plainCode,nm);a.wrapKteam=await encWith(ck,ME.kteamRaw);a.wrapTok=await encWith(ck,te.encode(vault.repoToken||""));}const c=Object.assign({},a);delete c._plainCode;out.acct[nm]=c;}
+  /* seed customers for enrolled members (needs their Km from their notes) */
+  for(const nm of TEAM.members){const rec=NOTES[nm];const list=(vault.custRaw&&vault.custRaw[nm])||[];if(rec&&rec.km&&list.length)out.cust[nm]=await encJSON(rec.km,list);else if(CFG.cust&&CFG.cust[nm])out.cust[nm]=CFG.cust[nm];}
+  REPO_TOKEN=vault.repoToken;
+  await ghPut("config.json",out,"publish config "+new Date().toISOString().slice(0,16));
+  CFG=Object.assign(CFG,{acct:out.acct,cust:out.cust});DIRTY=false;saveLocal();
+  if(msgEl)msgEl.textContent="✓ Terkirim. Tim mendapat perubahan saat membuka/refresh.";
+ }catch(e){if(msgEl)msgEl.textContent="Gagal: "+(e.status===401?"token tidak berlaku":(e.message||e));}
+}
+
+/* ================= seed customers from a dashboard file ================= */
+async function seedCustomers(file,msg){if(!file){return;}msg.textContent="Membaca file dashboard…";
+ try{const t=await file.text(),doc=new DOMParser().parseFromString(t,"text/html");
+  /* ask TL dashboard password to open the Customer Background blob */
+  const cbEl=doc.getElementById("cbseed");if(!cbEl)throw new Error("Bukan file dashboard Team E.");
+  const blob=JSON.parse(cbEl.textContent||"null");if(!blob)throw new Error("File ini belum ada data Kontak.");
+  const pw=prompt("Password Data TL dashboard (untuk membuka daftar customer):");if(!pw)return;msg.textContent="Membuka…";
+  const o=await decPw(pw,{salt:blob.salt,iv:blob.iv,ct:blob.ct}).catch(()=>null);
+  if(!o)throw new Error("Password salah.");const cb=JSON.parse(td.decode(await unzlibAsync(ub64(JSON.parse(td.decode(o)).z))));
+  const raw={};(cb.people||[]).forEach(p=>{const seen={},list=[];(p.sheets||[]).forEach(s=>(s.rows||[]).forEach(r=>{const sid=p.ids[r[0]];if(seen[sid])return;seen[sid]=1;list.push({sid,name:(p.names&&p.names[r[0]])||"",vip:(p.vips&&p.vips[r[1]])||""});}));if(list.length)raw[p.n]=list;});
+  ME.vault.custRaw=raw;markDirty();msg.textContent="✓ "+Object.keys(raw).length+" sales terbaca ("+Object.values(raw).reduce((s,l)=>s+l.length,0)+" customer). Klik Publish untuk mengirim ke anggota yang sudah aktivasi.";
+ }catch(e){msg.textContent="Gagal: "+(e.message||e);}
+}
+/* inflate the dashboard's fflate zlib payload via the browser's built-in DecompressionStream */
+async function unzlibAsync(u8){if("DecompressionStream" in window){const ds=new DecompressionStream("deflate");const ab=await new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer();return new Uint8Array(ab);}throw new Error("Browser tidak mendukung; buka di Chrome terbaru.");}
+
+/* ================= customer picker ================= */
+function openCustPicker(cb){const list=myCustomers(viewName());const ov=el("div",{class:"center",style:"position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:80;padding:16px"});
+ const box=el("div",{class:"card",style:"width:100%;max-width:460px;max-height:80vh;display:flex;flex-direction:column"});box.appendChild(el("b",null,"Pilih customer"));
+ const s=el("input",{class:"search",placeholder:"Cari nama / SID…",style:"margin-top:8px"});box.appendChild(s);
+ const cl=el("div",{class:"clist"});box.appendChild(cl);
+ const draw=q=>{cl.innerHTML="";const ql=q.toLowerCase();const f=list.filter(c=>!q||((c.name||"").toLowerCase().includes(ql)||String(c.sid).includes(q))).slice(0,200);
+  if(!f.length)cl.appendChild(el("div",{class:"empty"},list.length?"Tidak ada yang cocok.":"Belum ada daftar customer. Ketik manual atau minta TL memuat data."));
+  f.forEach(c=>{const row=el("div",{class:"crow"});row.appendChild(el("div",{class:"nm"},c.name||"(tanpa nama)"));row.appendChild(el("div",{class:"sid"},c.sid));row.onclick=()=>{cb((c.name||c.sid)+" · "+c.sid);ov.remove();};cl.appendChild(row);});};
+ draw("");s.oninput=()=>draw(s.value);
+ const close=el("button",{class:"btn ghost",style:"margin-top:10px"},"Tutup");close.onclick=()=>ov.remove();box.appendChild(close);
+ ov.appendChild(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);setTimeout(()=>s.focus(),50);}
+
+/* ================= notifications ================= */
+function askNotif(){if(!("Notification" in window)){toast("Browser tidak mendukung notifikasi.");return;}Notification.requestPermission().then(p=>toast(p==="granted"?"Notifikasi aktif.":"Notifikasi tidak diizinkan."));}
+let FIRED={};try{FIRED=JSON.parse(localStorage.getItem("fuFired")||"{}");}catch(e){}
+function notifyDue(){if(!ME)return;const items=dueItems();updateBadges();
+ if(!("Notification" in window)||Notification.permission!=="granted")return;
+ items.forEach(x=>{const key=ME.name+"|"+x.label+"|"+Math.floor(x.ms/6e4);if(FIRED[key])return;FIRED[key]=Date.now();
+  try{new Notification("FU & Tugas — perlu tindakan",{body:x.label,tag:key});}catch(e){}});
+ const ks=Object.keys(FIRED);if(ks.length>300)ks.sort((a,b)=>FIRED[a]-FIRED[b]).slice(0,ks.length-300).forEach(k=>delete FIRED[k]);
+ try{localStorage.setItem("fuFired",JSON.stringify(FIRED));}catch(e){}}
+function setFavBadge(n){try{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d");x.fillStyle="#3b5bdb";x.beginPath();x.arc(32,32,30,0,7);x.fill();x.fillStyle="#fff";x.font="bold 34px system-ui";x.textAlign="center";x.textBaseline="middle";x.fillText(n>9?"9+":String(n||""),32,36);
+  let l=document.querySelector("link[rel~=icon]");if(!l){l=document.createElement("link");l.rel="icon";document.head.appendChild(l);}l.href=n?c.toDataURL("image/png"):"data:image/png;base64,iVBORw0KGgo=";}catch(e){}}
+
+/* ================= remember-me (per device, key never leaves browser) ================= */
+async function remDevKey(){const d=await idb();if(!d)return null;let k=await idbGet(d,"credKey");if(!k){k=await crypto.subtle.generateKey({name:"AES-GCM",length:256},false,["encrypt","decrypt"]);await idbPut(d,"credKey",k);}return k;}
+function idb(){return new Promise(res=>{try{const q=indexedDB.open("fu_remote",1);q.onupgradeneeded=()=>q.result.createObjectStore("kv");q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);}catch(e){res(null);}});}
+function idbGet(d,k){return new Promise(res=>{try{const q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null);}catch(e){res(null);}});}
+function idbPut(d,k,v){return new Promise(res=>{try{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>res();t.onerror=()=>res();}catch(e){res();}});}
+function idbDel(d,k){return new Promise(res=>{try{const t=d.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=()=>res();t.onerror=()=>res();}catch(e){res();}});}
+async function remSave(name,pw){try{const d=await idb(),k=await remDevKey();if(!k)return;const iv=rnd(12),ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(JSON.stringify({name,pw})));await idbPut(d,"cred",{iv:b64(iv),ct:b64(ct)});}catch(e){}}
+async function remLoad(){try{const d=await idb();if(!d)return null;const c=await idbGet(d,"cred");if(!c)return null;const k=await idbGet(d,"credKey");if(!k)return null;const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:ub64(c.iv)},k,ub64(c.ct));return JSON.parse(td.decode(pt));}catch(e){return null;}}
+async function remForget(){const d=await idb();if(d)await idbDel(d,"cred");}
+
+/* ================= local cache of data (offline) ================= */
+async function saveLocal(){try{const d=await idb();if(!d)return;const notesOut={};for(const nm in NOTES)if(NOTES[nm].enc)notesOut[nm]=NOTES[nm].enc;await idbPut(d,"notesCache",notesOut);await idbPut(d,"cfgCache",CFG);}catch(e){}}
+
+/* ================= login screen ================= */
+function logout(){remForget();ME=null;REPO_TOKEN=null;showLogin();}
+function showLogin(){const r=$("#root");r.innerHTML="";const c=el("div",{class:"center"});const box=el("div",{class:"lbox card"});
+ box.appendChild(el("b",null,"FU & Tugas · Team E"));box.appendChild(el("div",{class:"sub",style:"margin-top:4px"},"Masuk untuk melihat follow-up dan tugas Anda."));
+ const who=el("select");who.appendChild(el("option",{value:""},"— pilih nama —"));who.appendChild(el("option",{value:"__tl"},"Rivan (Team Leader)"));TEAM.members.forEach(m=>who.appendChild(el("option",{value:m},m)));
+ box.appendChild(el("label",{style:"margin-top:10px"},"Nama"));box.appendChild(who);
+ const pwl=el("label",{style:"margin-top:10px"},"Password");const pw=el("input",{type:"password",autocomplete:"current-password"});box.appendChild(pwl);box.appendChild(pw);
+ const codeWrap=el("div",{hidden:""});codeWrap.appendChild(el("label",{style:"margin-top:10px"},"Kode aktivasi dari TL (hanya pertama kali)"));const code=el("input",{placeholder:"XXXX-XXXX"});codeWrap.appendChild(code);
+ const pw2wrap=el("div",{hidden:""});pw2wrap.appendChild(el("label",{style:"margin-top:10px"},"Ulangi password baru"));const pw2=el("input",{type:"password"});pw2wrap.appendChild(pw2);
+ const tokWrap=el("div",{hidden:""});tokWrap.appendChild(el("label",{style:"margin-top:10px"},"Token GitHub (repo E-Team-Tasks-Reminder)"));const tok=el("input",{type:"password",placeholder:"github_pat_…"});tokWrap.appendChild(tok);tokWrap.appendChild(el("div",{class:"sub"},"Fine-grained token, repo E-Team-Tasks-Reminder, Contents: Read and write."));
+ const hint=el("div",{class:"sub",hidden:"",style:"margin-top:8px"},"Gunakan password khusus untuk alat ini, jangan sama dengan akun lain.");
+ box.appendChild(codeWrap);box.appendChild(pw2wrap);box.appendChild(tokWrap);box.appendChild(hint);
+ const rem=el("label",{class:"chk",style:"margin-top:10px"});const rc=el("input",{type:"checkbox",checked:""});rem.appendChild(rc);rem.appendChild(document.createTextNode("Ingat saya di Chrome ini"));box.appendChild(rem);
+ const go=el("button",{class:"btn primary",style:"margin-top:12px;width:100%"},"Masuk");box.appendChild(go);
+ const err=el("div",{class:"err"});box.appendChild(err);
+ let mode="login";
+ function refresh(){const v=who.value;const member=v&&v!=="__tl";const tlNew=v==="__tl"&&(!CFG||!CFG.vault);
+  if(tlNew){mode="tlsetup";codeWrap.hidden=true;pw2wrap.hidden=false;tokWrap.hidden=false;hint.hidden=false;pwl.textContent="Buat password TL";go.textContent="Siapkan & masuk";}
+  else if(member&&!enrolledKnown(v)){mode="enroll";codeWrap.hidden=false;pw2wrap.hidden=false;tokWrap.hidden=true;hint.hidden=false;pwl.textContent="Buat password";go.textContent="Aktivasi & masuk";}
+  else{mode="login";codeWrap.hidden=true;pw2wrap.hidden=true;tokWrap.hidden=true;hint.hidden=true;pwl.textContent="Password";go.textContent="Masuk";}}
+ who.onchange=()=>{err.textContent="";refresh();};
+ go.onclick=async()=>{err.textContent="";const v=who.value;if(!v){err.textContent="Pilih nama dulu.";return;}
+  go.disabled=true;go.textContent="Memproses…";
+  try{
+   if(mode==="tlsetup"){if(pw.value.length<6)throw {code:"short"};if(pw.value!==pw2.value)throw {code:"nomatch"};if(!/^github_pat_/.test(tok.value.trim()))throw {code:"badtok"};await tlSetup(pw.value,tok.value.trim());}
+   else if(v==="__tl"){await tlLogin(pw.value);}
+   else if(mode==="enroll"){if(pw.value.length<6){throw {code:"short"};}if(pw.value!==pw2.value){throw {code:"nomatch"};}await enroll(v,code.value,pw.value);}
+   else{await memberLogin(v,pw.value);}
+   if(rc.checked)await remSave(v==="__tl"?"__tl":v,pw.value);else await remForget();
+   startApp();
+  }catch(e){go.disabled=false;refresh();
+   const m={badpw:"Password salah.",badcode:"Kode aktivasi salah.",nocode:"Belum ada kode aktivasi. Minta ke TL.",needenroll:"Anda belum aktivasi. Minta kode aktivasi ke TL.",short:"Password minimal 6 karakter.",nomatch:"Password tidak sama.",nocfg:"Data tim belum di-publish oleh TL.",badtok:"Token harus diawali github_pat_"}[e&&e.code];
+   err.textContent=m||("Gagal masuk: "+((e&&e.message)||e));}};
+ box.appendChild(el("div",{class:"sub",style:"margin-top:12px"},R.offline?"Mode offline — menampilkan data tersimpan.":"v"+R.ver));
+ c.appendChild(box);r.appendChild(c);refresh();
+ /* try remembered credential */
+ remLoad().then(cr=>{if(!cr)return;who.value=cr.name;refresh();pw.value=cr.pw;err.textContent="Masuk otomatis…";setTimeout(()=>go.click(),150);});
+}
+/* we only know a member is enrolled if their notes file has an account; cache that */
+let ENROLLED={};
+function enrolledKnown(name){return !!ENROLLED[name];}
+function memberHasPw(name){return !!ENROLLED[name];}
+
+/* ================= boot ================= */
+function startApp(){BOOTED=true;VIEW=null;TAB="fu";render();
+ if(!window.__fuTick){window.__fuTick=setInterval(()=>{if(ME){notifyDue();if(document.visibilityState==="visible"&&BOOTED){/* light refresh of badges */updateBadges();}}},30000);}
+ notifyDue();}
+(async function boot(){
+ try{const s=localStorage.getItem("fuTheme");if(s)document.documentElement.dataset.theme=s;}catch(e){}
+ /* learn which members are enrolled (public: their notes file exists with acct) */
+ if(CFG&&!R.offline){await Promise.all(TEAM.members.map(async m=>{const f=await fetchNotesFile(m);if(f&&f.acct&&f.acct.kmPw){ENROLLED[m]=true;NOTES[m]=NOTES[m]||{enc:f};}}));}
+ else{/* offline: load caches */try{const d=await idb();const nc=d&&await idbGet(d,"notesCache");if(nc){for(const nm in nc){NOTES[nm]={enc:nc[nm]};if(nc[nm].acct&&nc[nm].acct.kmPw)ENROLLED[nm]=true;}}const cc=d&&await idbGet(d,"cfgCache");if(cc&&!CFG)CFG=cc;}catch(e){}}
+ showLogin();
+})();
+</script>
+</body></html>

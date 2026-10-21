@@ -37,7 +37,9 @@
   document.getElementById("ghGo").onclick=publish;document.getElementById("ghPwGo").onclick=goPw;
   document.getElementById("ghTokDel").onclick=function(){if(!confirm(tr2("Hapus token dari Chrome ini?","Remove the token from this Chrome?")))return;TOKEN=null;try{localStorage.removeItem(TK);}catch(e){}lastMsg="";render();};}
  var lastPw=null;
- async function ensure(){if(typeof VIEW!=="undefined"&&VIEW==="tl"&&SESSION_PW&&lastPw!==SESSION_PW){if(lastPw!==null)rememberUpdate();lastPw=SESSION_PW;}var dl=document.getElementById("dlBtn");if(!dl)return;var b=el();
+ function needLock(){return typeof GLK!=="undefined"&&typeof STORE!=="undefined"&&STORE&&!STORE.glock&&(STORE.data||[]).length;}
+ function goGroups(){var d=document.querySelector(".datap");if(d)d.open=true;setTimeout(function(){var s=document.getElementById("glSet");if(s){s.scrollIntoView({block:"center",behavior:"smooth"});var i=s.querySelector("input[data-glk]");if(i)i.focus();}},150);}
+ async function ensure(){if(typeof VIEW!=="undefined"&&VIEW==="tl"&&needLock()){STORE.glock={labels:{}};STORE.dirty=true;try{renderAll();}catch(e){}}if(typeof VIEW!=="undefined"&&VIEW==="tl"&&SESSION_PW&&lastPw!==SESSION_PW){if(lastPw!==null)rememberUpdate();lastPw=SESSION_PW;}var dl=document.getElementById("dlBtn");if(!dl)return;var b=el();
   if(typeof VIEW==="undefined"||VIEW!=="tl"){if(b)b.hidden=true;TOKEN=null;TOKPW=null;return;}
   if(!b){b=document.createElement("div");b.id="ghPub";b.className="ghpub";dl.closest(".dpa").before(b);}
   dl.classList.remove("primary");b.hidden=false;var had=TOKEN,pw=TOKPW;await loadTok();if(!b.innerHTML||had!==TOKEN||pw!==TOKPW)render();}
@@ -54,9 +56,11 @@
    var nc=await api("POST","/git/commits",{message:"Update data "+label,tree:tree.sha,parents:[head]});
    try{await api("PATCH","/git/refs/heads/"+R.branch,{sha:nc.sha});return nc.sha;}catch(e){if(e.status!==422||i===2)throw e;}}}
  function weak(){var w=[];if((SESSION_PW||"").length<MIN)w.push(tr2("password Data TL","TL data password"));
-  if(typeof GLK!=="undefined"&&GLK.on()){var g=GLK.gpw||{};GLK.groupsOf(STORE).forEach(function(k){if(!g[k]||g[k].length<MIN)w.push(tr2("password grup ","group password ")+GLK.lbl(k));});}return w;}
+  if(typeof GLK!=="undefined"&&GLK.on()){var g=GLK.gpw||{};GLK.groupsOf(STORE).forEach(function(k){if(g[k]&&g[k].length<MIN)w.push(tr2("password grup ","group password ")+GLK.lbl(k));});}return w;}
  async function publish(){if(busy||!TOKEN)return;var w=weak();
   if(w.length){msg(tr2("Publish ditahan: "+w.join(", ")+" harus minimal "+MIN+" karakter. Isi password baru di kotak yang sekarang terbuka, lalu klik Publish lagi.","Publish held: "+w.join(", ")+" must be at least "+MIN+" characters. Enter a new password in the box now open, then click Publish again."),"er");goPw();return;}
+  if(typeof GLK==="undefined"||!GLK.on()){msg(tr2("Publish ditahan: data belum dikunci per grup. Isi password tiap grup di kotak 🔐 Password per grup, klik Simpan, lalu Publish lagi.","Publish held: data is not locked per group yet. Fill in each group's password, save, then Publish again."),"er");goGroups();return;}
+  var miss=(GLK.missing&&GLK.missing())||[];if(miss.length){msg(tr2("Publish ditahan: password grup "+miss.map(GLK.lbl).join(", ")+" belum diisi. Isi di kotak 🔐 Password per grup, klik Simpan, lalu Publish lagi.","Publish held: no password yet for "+miss.map(GLK.lbl).join(", ")+"."),"er");goGroups();return;}
   busy=true;var bt=document.getElementById("ghGo");if(bt)bt.disabled=true;
   try{msg(tr2("Menyiapkan data…","Preparing data…"));
    var at=vStamp(),ms=[...new Set(STORE.data.map(function(r){return r.month;}))].sort(),note=((document.getElementById("verNote")||{}).value||"").trim();
@@ -64,7 +68,7 @@
    STORE.versions=(STORE.versions||[]).concat([{at:at,last:ms[ms.length-1],n:STORE.data.length,note:(note||"Publish").slice(0,80)}]).slice(-15);STORE.dirty=false;
    await refreshPriv();var o=publicCopy();o.view="team";o.savedAt=Date.now();delete o.undo;
    var seed=o;if(typeof GLK!=="undefined"&&GLK.on())seed=await GLK.forStore(o);
-   if(seed.data&&seed.data.length&&typeof GLK!=="undefined"&&GLK.on())throw new Error("data grup tidak terkunci");
+   if((seed.data&&seed.data.length)||(seed.members&&seed.members.length)||!seed.glock)throw new Error("data belum terkunci per grup — tidak dikirim");
    var payload={fmt:1,at:o.savedAt,seed:seed,cb:(typeof CB_BLOB!=="undefined"&&(SESSION_PW||"").length>=STRONG?CB_BLOB:null)};var cbOut=typeof CB_BLOB!=="undefined"&&CB_BLOB&&!payload.cb;if(cbOut){try{localStorage.setItem("team"+TEAM+"_cb_v1",JSON.stringify({at:Date.now(),blob:CB_BLOB}));}catch(e){}}
    try{await upload(JSON.stringify(payload),at);}catch(e){STORE.versions=prevV;STORE.dirty=prevD;throw e;}
    R.at=o.savedAt;R.local=false;
@@ -81,6 +85,8 @@
  /* open the TL password form (it sits inside the collapsed settings section) */
  function goPw(){var d=document.querySelector(".datap");if(d)d.open=true;var st=document.querySelector("details.sets");if(st)st.open=true;
   setTimeout(function(){var i=document.getElementById("pw1");if(i){i.scrollIntoView({block:"center",behavior:"smooth"});i.focus();}},120);}
+ document.addEventListener("click",function(e){if(!(e.target.closest&&e.target.closest("#glSave")))return;
+  var n=0,iv=setInterval(function(){n++;var m=document.getElementById("glMsg");if(m&&/Download HTML terbaru|Download the latest HTML/.test(m.textContent)){clearInterval(iv);m.textContent=tr2("Tersimpan (terkunci di dalam Data TL). Klik ☁️ Publish, lalu bagikan password baru ke grup masing-masing.","Saved (locked inside the TL data). Click ☁️ Publish, then share the new passwords with each group.");}else if(n>60)clearInterval(iv);},150);},true);
  document.addEventListener("click",function(e){if(!(e.target.closest&&e.target.closest("#pwSave")))return;
   var n=0,iv=setInterval(function(){n++;var m=document.getElementById("pwMsg");if(m&&/Download HTML terbaru|Download latest HTML/.test(m.textContent)){clearInterval(iv);m.textContent=tr2("Password diganti. Klik ☁️ Publish supaya berlaku untuk semua.","Password changed. Click ☁️ Publish so it applies everywhere.");}else if(n>60)clearInterval(iv);},150);},true);
  /* remember me: the password is kept in this Chrome, locked with a key that cannot leave this browser */

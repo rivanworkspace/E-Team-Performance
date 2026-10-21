@@ -94,23 +94,37 @@
  function idb(){return new Promise(function(res){try{var q=indexedDB.open("te_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){res(q.result);};q.onerror=function(){res(null);};}catch(e){res(null);}});}
  async function kv(op,k,v){var d=await idb();if(!d)return null;return new Promise(function(res){try{var t=d.transaction("kv",op==="get"?"readonly":"readwrite"),s=t.objectStore("kv"),q=op==="get"?s.get(k):op==="put"?s.put(v,k):s.delete(k);q.onsuccess=function(){res(op==="get"?q.result:null);};q.onerror=function(){res(null);};}catch(e){res(null);}});}
  async function devKey(){var k=await kv("get",CKK);if(!k){k=await crypto.subtle.generateKey({name:"AES-GCM",length:256},false,["encrypt","decrypt"]);await kv("put",CKK,k);}return k;}
- async function remSave(who,pw){try{var k=await devKey(),iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},k,_te.encode(pw));await kv("put",CRK,{who:who,iv:iv,ct:new Uint8Array(ct)});}catch(e){}}
- async function remLoad(){try{var c=await kv("get",CRK);if(!c)return null;var k=await kv("get",CKK);if(!k)return null;var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:c.iv},k,c.ct);return {who:c.who,pw:_td.decode(pt)};}catch(e){return null;}}
- function remForget(){kv("del",CRK);}
- async function rememberUpdate(){var c=await remLoad();if(c&&c.who==="__tl"&&SESSION_PW&&c.pw!==SESSION_PW)remSave("__tl",SESSION_PW);}
+ /* saved passwords: one per choice (each group and TL data), kept in this Chrome, locked with a key that cannot leave it */
+ async function remAll(){try{var c=await kv("get",CRK);if(!c)return {last:null,pw:{}};var k=await kv("get",CKK);if(!k)return {last:null,pw:{}};var pt=_td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:c.iv},k,c.ct));
+   if(c.who!==undefined){var o={last:c.who,pw:{}};o.pw[c.who]=pt;return o;}var m=JSON.parse(pt);m.pw=m.pw||{};return m;}catch(e){return {last:null,pw:{}};}}
+ async function remPut(m){try{var k=await devKey(),iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},k,_te.encode(JSON.stringify(m)));await kv("put",CRK,{v:2,iv:iv,ct:new Uint8Array(ct)});}catch(e){}}
+ async function remSave(who,pw){var m=await remAll();m.pw[who]=pw;m.last=who;await remPut(m);}
+ async function remDel(who){var m=await remAll();delete m.pw[who];if(m.last===who)m.last=null;await remPut(m);}
+ async function remLoad(){var m=await remAll();return m.last&&m.pw[m.last]?{who:m.last,pw:m.pw[m.last]}:null;}
+ async function rememberUpdate(){var m=await remAll();if(m.pw.__tl&&SESSION_PW&&m.pw.__tl!==SESSION_PW){m.pw.__tl=SESSION_PW;await remPut(m);}}
+ function bad(t){return /salah|Wrong/.test(t||"");}
  async function gateWatch(){var g=document.getElementById("glGate");if(!g)return;var f=g.querySelector("form");if(!f||f.dataset.rem)return;f.dataset.rem="1";
-  var go=document.getElementById("glGo"),lb=document.createElement("label");lb.className="te-rem";lb.style.cssText="display:flex;flex-direction:row;align-items:center;gap:6px;font-size:12.5px;margin:2px 0 4px";
+  var go=document.getElementById("glGo"),sel=document.getElementById("glWho"),pw=document.getElementById("glPw"),er=document.getElementById("glErr"),lb=document.createElement("label");lb.className="te-rem";lb.style.cssText="display:flex;flex-direction:row;align-items:center;gap:6px;font-size:12.5px;margin:2px 0 4px";
   lb.innerHTML='<input type="checkbox" id="teRem" checked style="width:auto;margin:0"> '+tr2("Ingat password di Chrome ini","Remember password in this Chrome");go.before(lb);
-  f.addEventListener("submit",function(){pend={who:document.getElementById("glWho").value,pw:document.getElementById("glPw").value,rem:document.getElementById("teRem").checked};
-   var n=0,iv=setInterval(function(){n++;if(!document.getElementById("glGate")){clearInterval(iv);if(pend){if(pend.rem)remSave(pend.who,pend.pw);else remForget();pend=null;}}
-    else if(n>40||(document.getElementById("glErr")||{}).textContent.indexOf("salah")>=0||(document.getElementById("glErr")||{}).textContent.indexOf("Wrong")>=0){clearInterval(iv);pend=null;}},250);},true);
-  if(tried)return;tried=true;var skip=false;try{skip=sessionStorage.getItem("teNoAuto")==="1";sessionStorage.removeItem("teNoAuto");}catch(e){}if(skip)return;var c=await remLoad();if(!c)return;var sel=document.getElementById("glWho");
-  if(![].some.call(sel.options,function(o){return o.value===c.who;})){remForget();return;}
-  sel.value=c.who;document.getElementById("glPw").value=c.pw;document.getElementById("glErr").textContent=tr2("Masuk otomatis…","Signing in…");
-  var n=0,iv=setInterval(function(){n++;var e=document.getElementById("glErr");if(!document.getElementById("glGate")){clearInterval(iv);}
-   else if(e&&/salah|Wrong/.test(e.textContent)){clearInterval(iv);remForget();document.getElementById("glPw").value="";e.textContent=tr2("Password tersimpan sudah tidak berlaku. Masukkan password baru.","The saved password no longer works. Enter the new one.");}
-   else if(n>80)clearInterval(iv);},250);
-  pend={who:c.who,pw:c.pw,rem:true};f.requestSubmit?f.requestSubmit(go):go.click();}
+  f.addEventListener("submit",function(){pend={who:sel.value,pw:pw.value,rem:document.getElementById("teRem").checked};
+   var n=0,iv=setInterval(function(){n++;if(!document.getElementById("glGate")){clearInterval(iv);if(pend){if(pend.rem)remSave(pend.who,pend.pw);else remDel(pend.who);pend=null;}}
+    else if(n>40||bad(er.textContent)){clearInterval(iv);if(pend&&bad(er.textContent))remDel(pend.who);pend=null;}},250);},true);
+  var m=await remAll();
+  /* mark the choices that already have a saved password; picking one signs in at once */
+  [].forEach.call(sel.options,function(o){if(m.pw[o.value]&&o.text.indexOf("✓")<0)o.text=o.text+"  ✓";});
+  function useSaved(){var v=m.pw[sel.value];if(!v)return false;pw.value=v;er.textContent=tr2("Masuk dengan password tersimpan…","Signing in with the saved password…");pend={who:sel.value,pw:v,rem:true};f.requestSubmit?f.requestSubmit(go):go.click();return true;}
+  sel.addEventListener("change",function(){pw.value="";useSaved();});
+  if(tried)return;tried=true;var skip=false;try{skip=sessionStorage.getItem("teNoAuto")==="1";sessionStorage.removeItem("teNoAuto");}catch(e){}
+  if(skip){if(Object.keys(m.pw).length)er.textContent=tr2("Pilih grup atau Data TL. Yang bertanda ✓ langsung terbuka.","Pick a group or TL data. Ones marked ✓ open at once.");return;}
+  if(!m.last||!m.pw[m.last]||![].some.call(sel.options,function(o){return o.value===m.last;}))return;
+  sel.value=m.last;useSaved();}
+ /* "Data TL" from the menu asks for the TL password in a small box: fill it from the saved one */
+ var lockTried=false;
+ function lockWatch(){var L=document.getElementById("lock"),inp=document.getElementById("lockPin"),f=document.getElementById("lockForm");if(!L||!inp||!f)return;
+  if(L.hidden){lockTried=false;return;}
+  if(!f.dataset.rem){f.dataset.rem="1";f.addEventListener("submit",function(){var v=inp.value;var n=0,iv=setInterval(function(){n++;if(L.hidden){clearInterval(iv);if(typeof VIEW!=="undefined"&&VIEW==="tl"&&v)remSave("__tl",v);}else if(n>40)clearInterval(iv);},250);},true);}
+  if(lockTried)return;lockTried=true;remAll().then(function(m){if(!m.pw.__tl||L.hidden)return;inp.value=m.pw.__tl;var e=document.getElementById("lockErr");if(e)e.textContent=tr2("Membuka dengan password tersimpan…","Opening with the saved password…");f.requestSubmit?f.requestSubmit():f.dispatchEvent(new Event("submit",{cancelable:true}));});}
+ setInterval(lockWatch,300);
 
  /* share links: the same tools opened from a web link (GitHub Pages) instead of a file */
  var PAGES="https://"+R.owner+".github.io/"+R.repo+"/";

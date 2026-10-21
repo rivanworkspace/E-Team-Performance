@@ -104,7 +104,7 @@
   f.addEventListener("submit",function(){pend={who:document.getElementById("glWho").value,pw:document.getElementById("glPw").value,rem:document.getElementById("teRem").checked};
    var n=0,iv=setInterval(function(){n++;if(!document.getElementById("glGate")){clearInterval(iv);if(pend){if(pend.rem)remSave(pend.who,pend.pw);else remForget();pend=null;}}
     else if(n>40||(document.getElementById("glErr")||{}).textContent.indexOf("salah")>=0||(document.getElementById("glErr")||{}).textContent.indexOf("Wrong")>=0){clearInterval(iv);pend=null;}},250);},true);
-  if(tried)return;tried=true;var c=await remLoad();if(!c)return;var sel=document.getElementById("glWho");
+  if(tried)return;tried=true;var skip=false;try{skip=sessionStorage.getItem("teNoAuto")==="1";sessionStorage.removeItem("teNoAuto");}catch(e){}if(skip)return;var c=await remLoad();if(!c)return;var sel=document.getElementById("glWho");
   if(![].some.call(sel.options,function(o){return o.value===c.who;})){remForget();return;}
   sel.value=c.who;document.getElementById("glPw").value=c.pw;document.getElementById("glErr").textContent=tr2("Masuk otomatis…","Signing in…");
   var n=0,iv=setInterval(function(){n++;var e=document.getElementById("glErr");if(!document.getElementById("glGate")){clearInterval(iv);}
@@ -134,6 +134,9 @@
   if(tl&&g&&!document.getElementById("teShareBtn")){var b=document.createElement("button");b.className="dbtn";b.id="teShareBtn";b.textContent="🔗 "+tr2("Bagikan link","Share link");b.onclick=function(){try{openDrawer(false);}catch(e){}openShare();};g.insertBefore(b,g.firstChild);}
   var pb=document.getElementById("ghPub");if(pb&&!pb.hidden&&!document.getElementById("teShareBtn2")){var row=pb.querySelector(".dpa");if(row){var b2=document.createElement("button");b2.className="btn";b2.id="teShareBtn2";b2.textContent="🔗 "+tr2("Link untuk tim","Team links");b2.onclick=openShare;row.appendChild(b2);}}}
  setInterval(shareBtn,800);shareBtn();
+ /* "Switch group" / leaving TL data: show the sign-in screen once instead of signing straight back in */
+ document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest("#glSwitch")){try{sessionStorage.setItem("teNoAuto","1");}catch(x){}}},true);
+ if(typeof exitTL==="function"){var _xt=exitTL;exitTL=function(){try{sessionStorage.setItem("teNoAuto","1");}catch(x){}return _xt.apply(this,arguments);};}
  setInterval(gateWatch,300);gateWatch();
  setInterval(ensure,700);ensure();
  try{renderStale();}catch(e){}

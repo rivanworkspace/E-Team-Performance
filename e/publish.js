@@ -1,7 +1,7 @@
-/* Team E publish: only present when the dashboard was opened through the loader. TL mode gets a Publish box in the Update data panel. */
+/* Team dashboard publish: only present when the dashboard was opened through the loader. TL mode gets a Publish box in the Update data panel. */
 (function(){
  var R=window.__TE_REMOTE;if(!R)return;
- var TK="teamE_ghtok_v1",API="https://api.github.com/repos/"+R.owner+"/"+R.repo,PATH=R.dir+"/data.json",MIN=6,STRONG=12;
+ var NS=R.ns||"",TEAM=R.team||"E",TK="team"+TEAM+"_ghtok_v1",API="https://api.github.com/repos/"+R.owner+"/"+R.repo,PATH=R.dir+"/data.json",MIN=6,STRONG=12;
  var TOKEN=null,TOKPW=null,busy=false,lastMsg="";
  var st=document.createElement("style");
  st.textContent=".ghpub{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--line,#d5d9e4);border-radius:12px;background:var(--card,#fff)}.ghpub h4{margin:0 0 6px;font-size:13.5px}.ghpub .dpa{margin-top:8px}.ghpub input[type=password]{min-width:260px;padding:6px 8px;border:1px solid var(--line,#d5d9e4);border-radius:8px;background:transparent;color:inherit}.ghpub ol{margin:6px 0 0 18px;padding:0;font-size:12px}.ghpub details{margin-top:8px;font-size:12px}.ghpub .ok{color:var(--pos,#1a7f4b)}.ghpub .er{color:var(--neg,#c0392b)}.te-off{position:fixed;left:12px;bottom:12px;z-index:50;font-size:12px;padding:5px 10px;border-radius:999px;background:#fff4d6;color:#6b4d0f;border:1px solid #f0d58a}";
@@ -58,10 +58,10 @@
    await refreshPriv();var o=publicCopy();o.view="team";o.savedAt=Date.now();delete o.undo;
    var seed=o;if(typeof GLK!=="undefined"&&GLK.on())seed=await GLK.forStore(o);
    if(seed.data&&seed.data.length&&typeof GLK!=="undefined"&&GLK.on())throw new Error("data grup tidak terkunci");
-   var payload={fmt:1,at:o.savedAt,seed:seed,cb:(typeof CB_BLOB!=="undefined"&&(SESSION_PW||"").length>=STRONG?CB_BLOB:null)};var cbOut=typeof CB_BLOB!=="undefined"&&CB_BLOB&&!payload.cb;if(cbOut){try{localStorage.setItem("teamE_cb_v1",JSON.stringify({at:Date.now(),blob:CB_BLOB}));}catch(e){}}
+   var payload={fmt:1,at:o.savedAt,seed:seed,cb:(typeof CB_BLOB!=="undefined"&&(SESSION_PW||"").length>=STRONG?CB_BLOB:null)};var cbOut=typeof CB_BLOB!=="undefined"&&CB_BLOB&&!payload.cb;if(cbOut){try{localStorage.setItem("team"+TEAM+"_cb_v1",JSON.stringify({at:Date.now(),blob:CB_BLOB}));}catch(e){}}
    try{await upload(JSON.stringify(payload),at);}catch(e){STORE.versions=prevV;STORE.dirty=prevD;throw e;}
    R.at=o.savedAt;R.local=false;
-   try{var q=indexedDB.open("te_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){try{var t=q.result.transaction("kv","readwrite"),s=t.objectStore("kv");s.put(payload,"data");s.delete("localSeed");}catch(e){}};}catch(e){}
+   try{var q=indexedDB.open("te_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){try{var t=q.result.transaction("kv","readwrite"),s=t.objectStore("kv");s.put(payload,NS+"data");s.delete(NS+"localSeed");}catch(e){}};}catch(e){}
    await persist();try{renderDirty();}catch(e){}try{renderVersions();}catch(e){}try{renderHeader();}catch(e){}
    render();msg("✓ "+tr2("Terkirim "+stamp(o.savedAt)+". Tim mendapat data ini saat membuka atau refresh dashboard (±1 menit).","Sent "+stamp(o.savedAt)+". The team gets it when they open or refresh the dashboard (about 1 minute).")+(cbOut?" "+tr2("Data tab Kontak (nama & SID customer) tidak ikut dikirim karena password TL kurang dari "+STRONG+" karakter; tetap ada di Chrome ini.","Contacts tab data (customer names & SIDs) was not sent because the TL password is under "+STRONG+" characters; it stays in this Chrome."):""),"ok");}
   catch(e){var s=e&&e.status,t=String(e&&e.message||e);
@@ -77,7 +77,7 @@
  document.addEventListener("click",function(e){if(!(e.target.closest&&e.target.closest("#pwSave")))return;
   var n=0,iv=setInterval(function(){n++;var m=document.getElementById("pwMsg");if(m&&/Download HTML terbaru|Download latest HTML/.test(m.textContent)){clearInterval(iv);m.textContent=tr2("Password diganti. Klik ☁️ Publish supaya berlaku untuk semua.","Password changed. Click ☁️ Publish so it applies everywhere.");}else if(n>60)clearInterval(iv);},150);},true);
  /* remember me: the password is kept in this Chrome, locked with a key that cannot leave this browser */
- var CRK="cred",CKK="credKey",tried=false,pend=null;
+ var CRK=NS+"cred",CKK="credKey",tried=false,pend=null;
  function idb(){return new Promise(function(res){try{var q=indexedDB.open("te_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){res(q.result);};q.onerror=function(){res(null);};}catch(e){res(null);}});}
  async function kv(op,k,v){var d=await idb();if(!d)return null;return new Promise(function(res){try{var t=d.transaction("kv",op==="get"?"readonly":"readwrite"),s=t.objectStore("kv"),q=op==="get"?s.get(k):op==="put"?s.put(v,k):s.delete(k);q.onsuccess=function(){res(op==="get"?q.result:null);};q.onerror=function(){res(null);};}catch(e){res(null);}});}
  async function devKey(){var k=await kv("get",CKK);if(!k){k=await crypto.subtle.generateKey({name:"AES-GCM",length:256},false,["encrypt","decrypt"]);await kv("put",CKK,k);}return k;}

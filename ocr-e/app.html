@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta name="app-version" content="26.10.21-1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cek Foto Bukti · Team E</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F4FA;--card:#fff;--card2:#F7F8FC;--line:#E1E5EF;--line2:#CDD3E1;--text:#141A2B;--muted:#5F6879;--accent:#4F46E5;--accent2:#7C3AED;--acc-soft:rgba(79,70,229,.08);
+ --ok:#047857;--ok-soft:rgba(16,185,129,.12);--bad:#B91C1C;--bad-soft:rgba(239,68,68,.11);--warn:#B45309;--warn-soft:rgba(245,158,11,.14);--shadow:0 1px 2px rgba(20,26,43,.04),0 4px 14px rgba(20,26,43,.05)}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1120;--card:#151A2C;--card2:#1B2136;--line:#262E47;--line2:#343D5C;--text:#E9EBF4;--muted:#9AA3B9;--accent:#8B93FA;--accent2:#B197FC;--acc-soft:rgba(139,147,250,.12);
+ --ok:#34D399;--ok-soft:rgba(52,211,153,.13);--bad:#F87171;--bad-soft:rgba(248,113,113,.13);--warn:#FBBF24;--warn-soft:rgba(251,191,36,.13);--shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 "Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:14px 16px 40px}
+[hidden]{display:none!important}
+.hero{background:linear-gradient(115deg,#1E1B4B 0%,#3730A3 55%,#6D28D9 100%);color:#fff;border-radius:14px;padding:12px 18px;margin-bottom:10px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hero h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em}.hero p{margin:3px 0 0;opacity:.85;font-size:13px;max-width:560px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);white-space:nowrap}
+.pill i{width:7px;height:7px;border-radius:50%;background:#6EE7B7;display:inline-block}.pill.off i{background:#FCD34D}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.ch{display:flex;align-items:center;gap:8px;margin:0 0 8px}.ch h2{margin:0;font-size:14.5px;font-weight:600}
+.num{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--acc-soft);color:var(--accent);font-size:13px;font-weight:700}
+.ch .sub{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.muted{color:var(--muted);font-size:12.5px}.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+button,.btn{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line2);background:var(--card);color:var(--text);border-radius:10px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;line-height:1.2}
+button:hover:not(:disabled),.btn:hover{border-color:var(--accent);color:var(--accent)}button:disabled{opacity:.45;cursor:not-allowed}
+.pri{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;padding:9px 18px}.pri:hover:not(:disabled){color:#fff;filter:brightness(1.08)}
+input[type=password]{font:inherit;font-size:14px;border:1px solid var(--line2);background:var(--card2);color:var(--text);border-radius:10px;padding:10px 12px;width:100%}
+input[type=month],select{font:inherit;font-size:12.5px;border:1px solid var(--line2);background:var(--card);color:var(--text);border-radius:8px;padding:5px 8px;max-width:100%}
+input:focus,select:focus,button:focus-visible,.btn:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+/* lock */
+#lock{max-width:440px;margin:28px auto}#lock form{display:grid;gap:10px}#lockErr{min-height:20px;color:var(--warn);font-size:12.5px}
+/* drop zone */
+.drop{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 10px;border:2px dashed var(--line2);border-radius:12px;padding:12px 14px;text-align:center;background:var(--card2);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--acc-soft)}
+.drop svg{color:var(--accent)}.drop b{font-size:14.5px;font-weight:600}
+.conn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--muted)}.conn i{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}.conn.off i{background:var(--warn)}
+/* sheet list */
+.tw{overflow-x:auto;margin-top:12px;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:middle}
+tr:last-child td{border-bottom:0}th{font-weight:600;color:var(--muted);font-size:11.5px;background:var(--card2)}
+td.r,th.r{text-align:right}td.stc{white-space:normal;min-width:170px}td.stc .tag{margin:2px 4px 2px 0}tr.off td{opacity:.5}tr.sel td{background:var(--acc-soft)}
+.sn{font-weight:600;max-width:260px;overflow:hidden;text-overflow:ellipsis}.fn{display:block;font-weight:400;color:var(--muted);font-size:11.5px;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.tag.new{background:var(--warn-soft);color:var(--warn)}.tag.bad{background:var(--bad-soft);color:var(--bad)}.tag.done{background:var(--ok-soft);color:var(--ok)}.tag.none{background:var(--card2);color:var(--muted);font-weight:500}.tag.info{background:var(--acc-soft);color:var(--accent)}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent)}
+/* run */
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spd{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.prog{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card2)}
+.prog .big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.prog .big b{font-size:22px;font-weight:700;letter-spacing:-.01em}.prog .big span{color:var(--muted);font-size:12.5px}
+.bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin:10px 0 8px}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .3s}
+ul.tips{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:4px}ul.tips li{font-size:12.5px;color:var(--muted);padding-left:18px;position:relative}ul.tips li:before{content:"•";position:absolute;left:5px;color:var(--accent)}
+/* results */
+.sync{display:flex;gap:10px;align-items:flex-start;background:var(--ok-soft);border-radius:12px;padding:12px 14px;font-size:13px;margin-top:12px}.sync b{color:var(--ok)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+.gal figure{margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card2)}
+.gal img{display:block;width:100%;height:120px;object-fit:contain;background:#fff;cursor:zoom-in}.gal figcaption{padding:6px 8px;font-size:11.5px;line-height:1.35}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(5,8,20,.82);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}.lb img{max-width:96vw;max-height:90vh;border-radius:8px;background:#fff}
+/* stored */
+.stat{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px}.stat div{display:grid}.stat b{font-size:16px;font-weight:700}.stat span{font-size:12px;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;background:var(--card2)}
+.foot{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
+@media (max-width:640px){.hero{padding:16px 18px}.hero h1{font-size:19px}.card{padding:15px}.prog .big b{font-size:19px}}
+.xlg{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:520px}.xlg input[type=password]{padding:8px 10px;font-size:13px}.xlg label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}.xlg select{font:inherit;font-size:13px;border:1px solid var(--line2);background:var(--card2);color:var(--text);border-radius:10px;padding:8px 10px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:2px 0 10px}.how div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.45}.how b{display:block;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header class="hero"><div><h1>Cek Foto Bukti</h1><p>Baca foto bukti kontak, lalu kirim hasilnya ke tab Kontak dashboard Team E.</p></div>
+  <div class="pills"><span class="pill"><i></i>Bisa tanpa internet</span><span class="pill"><i></i>Foto tidak dikirim ke mana pun</span></div></header>
+
+ <div class="card" id="lock"><div class="ch"><span class="num">🔒</span><h2>Masukkan password Data TL</h2></div><form id="lockForm" autocomplete="off">
+  <div class="muted">Sama dengan password Data TL di dashboard Team E. Hasil bacaan foto dikunci dengan password ini.</div>
+  <input type="password" id="pw" placeholder="Password Data TL" autocomplete="current-password">
+  <span class="muted" id="pw2l" hidden>Ketik ulang password</span><input type="password" id="pw2" hidden placeholder="Ulangi password">
+  <button class="pri" type="submit">Buka</button><div id="lockErr" role="status"></div></form></div>
+
+ <main id="main" hidden>
+  <section class="card"><div class="ch"><span class="num">1</span><h2>Pilih file Customer Background</h2></div>
+   <label class="drop" id="drop" for="fileIn">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+    <b>Tarik file .xlsx ke sini</b><span class="muted">atau klik untuk memilih · bisa beberapa sales sekaligus</span></label>
+   <input type="file" id="fileIn" accept=".xlsx" multiple hidden>
+   <div class="muted" id="fileSt" style="margin-top:8px" role="status"></div>
+   <div class="conn" id="who"></div>
+   <div id="sheets"></div></section>
+
+  <section class="card"><div class="ch"><span class="num">2</span><h2>Baca foto</h2><span class="sub" id="selInfo"></span></div>
+   <div class="row"><button class="pri" id="go" disabled>Mulai baca foto</button><button id="pause" hidden>Jeda</button>
+    <label class="spd">Kecepatan <select id="nw" aria-label="Kecepatan baca"></select></label></div>
+   <div class="prog" id="prog" hidden><div class="big"><b id="pgN">0 / 0 foto</b><span id="pgEta"></span></div><div class="bar"><i id="bar"></i></div><div class="muted" id="runSt" role="status"></div></div>
+   <div class="muted" style="margin-top:8px">Biarkan tab ini terbuka sampai selesai. Kalau terputus, jalankan lagi; bacaan lanjut dari foto yang belum dibaca.</div></section>
+
+  <section class="card" id="resCard" hidden><div class="ch"><span class="num">3</span><h2>Hasil</h2></div><div id="results"></div><div id="chgBox"></div>
+   <div class="sync" id="sync" hidden><span>✓</span><div><b>Hasil sudah masuk ke dashboard Team E</b> yang dibuka di Chrome ini (tab Kontak), tanpa perlu reload.<br><span class="muted">Untuk laptop lain: simpan hasil ini, lalu muat di dashboard (tab Kontak › Foto bukti).</span></div></div>
+   <div class="row" style="margin-top:12px"><button id="expNew">⬇ Simpan hasil ini (.tefoto)</button><span class="muted" id="expSt"></span></div></section>
+
+  <section class="card" id="xlCard"><div class="ch"><span class="num">⬇</span><h2>Excel: SID, no HP, foto</h2><span class="sub" id="xlInfo"></span></div>
+   <div class="row"><button class="pri" id="xlGo">Buat Excel</button><label class="spd" hidden>Bulan <select id="xlMonth"></select></label>
+    <label class="spd">Foto <select id="xlMode"><option value="crop">Potongan (kecil)</option><option value="full">Utuh (besar)</option></select></label>
+    <label class="spd" title="Bawaan: dikunci dengan password Data TL"><input type="checkbox" id="xlOwn"> Password lain</label></div>
+   <div class="xlg" id="xlPwRow" hidden style="margin-top:8px"><input type="password" id="xlPw" autocomplete="new-password" placeholder="Password Excel (min. 6)"><input type="password" id="xlPw2" autocomplete="new-password" placeholder="Ulangi"></div>
+   <div class="muted" id="xlSt" role="status" style="margin-top:6px"></div></section>
+
+  <section class="card"><div class="ch"><span class="num">≡</span><h2>Cadangan foto</h2><span class="sub" title="Foto dikenali dari isinya, bukan SID: foto baru selalu dibaca; foto yang sama di bulan lain memakai hasil bacaan lama tapi dicocokkan ulang dengan SID bulan itu.">ⓘ cara kerja</span></div>
+   <div class="row"><div id="packs" class="muted"></div><span style="flex:1"></span><button id="expAll">⬇ Simpan .tefoto</button><label class="btn">⬆ Muat .tefoto…<input type="file" id="impIn" accept=".tefoto" multiple hidden></label></div>
+   <div class="muted" id="impSt"></div></section>
+ </main>
+ <div class="foot">Cek Foto Bukti · Team E · semua proses berjalan di laptop ini · v26.10.21-1</div>
+</div>
+<script>/*@A:fflate-c3b34f2e9f5e.txt@*/</script>
+<script>/*@A:tess-a8e29918d098.txt@*/</script>
+<script type="text/plain" id="tcore">/*@A:core-ce20eda9533c.txt@*/</script>
+<script type="text/plain" id="twork">/*@A:work-aca1229639fc.txt@*/</script>
+<script type="text/plain" id="tdata">/*@A:tdata-396b9ea38c7b.txt@*/</script>
+<script>/*@A:ort-654435ead2d8.txt@*/</script>
+<script type="text/plain" id="pwasm">/*@A:pwasm-0f02caef9227.txt@*/</script>
+<script type="text/plain" id="pdet">/*@A:pdet-01802a6df99d.txt@*/</script>
+<script type="text/plain" id="prec">/*@A:prec-403c7658ab7b.txt@*/</script>
+<script type="text/plain" id="pdict">/*@A:pdict-2e26b25406e6.txt@*/</script>
+<script>/* ===== PaddleOCR (PP-OCRv3) in the browser via onnxruntime-web, offline ===== */
+const PD=(function(){
+ let det=null,rec=null,CH=null,ready=null,EP="",RB=6;
+ const gunz=u8=>fflate.gunzipSync(u8);
+ const b64u8=id=>{const s=document.getElementById(id).textContent.trim(),b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;};
+ function init(){if(ready)return ready;ready=(async()=>{
+   const wasm=gunz(b64u8("pwasm")),url=URL.createObjectURL(new Blob([wasm],{type:"application/wasm"}));
+   ort.env.wasm.numThreads=1;ort.env.wasm.proxy=false;ort.env.wasm.simd=true;ort.env.wasm.wasmPaths={"ort-wasm-simd.wasm":url,"ort-wasm.wasm":url};
+   const dm=gunz(b64u8("pdet")),rm=gunz(b64u8("prec"));
+   {const o={executionProviders:["wasm"],graphOptimizationLevel:"all"};det=await ort.InferenceSession.create(dm,o);rec=await ort.InferenceSession.create(rm,o);EP="wasm";}
+   CH=["",...fflate.strFromU8(gunz(b64u8("pdict"))).split("\n")," "];})();
+  ready.catch(()=>{ready=null;});return ready;}
+ const cnv=(w,h)=>{const c=document.createElement("canvas");c.width=w;c.height=h;return c;};
+ /* src: ImageBitmap/canvas of size W×H. Returns lines [[text,x,y,w,h,score]] in src coordinates. */
+ async function read(src,W,H){await init();
+  /* shortest side to 736 px as before, but long thin strips are not blown up (they used to become ~8000 px wide) */
+  let r=Math.min(736/Math.min(W,H),1600/Math.max(W,H));if(r>2)r=2;
+  const rw=Math.max(32,Math.round(W*r/32)*32),rh=Math.max(32,Math.round(H*r/32)*32);
+  const c=cnv(rw,rh),g=c.getContext("2d",{willReadFrequently:true});g.drawImage(src,0,0,rw,rh);const px=g.getImageData(0,0,rw,rh).data,N=rw*rh,f=new Float32Array(3*N);
+  const mean=[.485,.456,.406],std=[.229,.224,.225];
+  for(let i=0;i<N;i++){for(let k=0;k<3;k++)f[k*N+i]=(px[i*4+k]/255-mean[k])/std[k];}
+  const out=await det.run({[det.inputNames[0]]:new ort.Tensor("float32",f,[1,3,rh,rw])}),pm=out[det.outputNames[0]].data;
+  /* binarize (0.3) + 2×2 dilation */
+  const bin=new Uint8Array(N);for(let y=0;y<rh;y++)for(let x=0;x<rw;x++){const i=y*rw+x;if(pm[i]>.3){bin[i]=1;if(x+1<rw)bin[i+1]=bin[i+1]||2;if(y+1<rh){bin[i+rw]=bin[i+rw]||2;if(x+1<rw)bin[i+rw+1]=bin[i+rw+1]||2;}}}
+  /* connected components → boxes */
+  const lab=new Int32Array(N),stack=new Int32Array(N),boxes=[];let L=0;
+  for(let i=0;i<N;i++){if(!bin[i]||lab[i])continue;L++;let sp=0,x0=1e9,y0=1e9,x1=-1,y1=-1;stack[sp++]=i;lab[i]=L;
+   while(sp){const j=stack[--sp],x=j%rw,y=(j-x)/rw;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;
+    if(x>0&&bin[j-1]&&!lab[j-1]){lab[j-1]=L;stack[sp++]=j-1;}if(x<rw-1&&bin[j+1]&&!lab[j+1]){lab[j+1]=L;stack[sp++]=j+1;}
+    if(y>0&&bin[j-rw]&&!lab[j-rw]){lab[j-rw]=L;stack[sp++]=j-rw;}if(y<rh-1&&bin[j+rw]&&!lab[j+rw]){lab[j+rw]=L;stack[sp++]=j+rw;}}
+   const bw=x1-x0+1,bh=y1-y0+1;if(Math.min(bw,bh)<3)continue;
+   let s=0;for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)s+=pm[y*rw+x];s/=bw*bh;if(s<.5)continue;
+   const d=bw*bh*1.6/(2*(bw+bh));const ex0=Math.max(0,x0-d),ey0=Math.max(0,y0-d),ex1=Math.min(rw,x1+1+d),ey1=Math.min(rh,y1+1+d);
+   if(Math.min(ex1-ex0,ey1-ey0)<5)continue;boxes.push([ex0*W/rw,ey0*H/rh,(ex1-ex0)*W/rw,(ey1-ey0)*H/rh]);if(boxes.length>=1000)break;}
+  boxes.sort((a,b)=>Math.abs(a[1]-b[1])<10?a[0]-b[0]:a[1]-b[1]);
+  /* recognition, batches of 6 sorted by aspect ratio */
+  const items=boxes.map(b=>({b,ar:b[2]/Math.max(1,b[3])})).sort((a,b)=>a.ar-b.ar),res=[];
+  for(let k=0;k<items.length;k+=RB){const bt=items.slice(k,k+RB),maxr=Math.max(...bt.map(x=>x.ar)),IW=Math.max(8,Math.ceil(48*maxr)),T=new Float32Array(bt.length*3*48*IW);
+   bt.forEach((it,n)=>{const [x,y,w,h]=it.b,rwid=Math.min(IW,Math.ceil(48*w/Math.max(1,h))),c2=cnv(rwid,48),g2=c2.getContext("2d",{willReadFrequently:true});g2.drawImage(src,x,y,w,h,0,0,rwid,48);
+    const p2=g2.getImageData(0,0,rwid,48).data,base=n*3*48*IW;for(let yy=0;yy<48;yy++)for(let xx=0;xx<rwid;xx++){const q=(yy*rwid+xx)*4;for(let ch=0;ch<3;ch++)T[base+ch*48*IW+yy*IW+xx]=(p2[q+ch]/255-.5)/.5;}});
+   const o2=await rec.run({[rec.inputNames[0]]:new ort.Tensor("float32",T,[bt.length,3,48,IW])}),pr=o2[rec.outputNames[0]],[nb,ts,nc]=pr.dims,pd=pr.data;
+   for(let n=0;n<nb;n++){let txt="",sc=0,cnt=0,prev=-1;for(let t=0;t<ts;t++){let bi=0,bv=-1;const off=(n*ts+t)*nc;for(let c=0;c<nc;c++){const v=pd[off+c];if(v>bv){bv=v;bi=c;}}
+     if(bi!==0&&bi!==prev){txt+=CH[bi]||"";sc+=bv;cnt++;}prev=bi;}
+    const s=cnt?sc/cnt:0;if(txt.trim()&&s>=.5){const [x,y,w,h]=bt[n].b;res.push([txt,Math.round(x),Math.round(y),Math.round(w),Math.round(h),Math.round(s*100)]);}}}
+  res.sort((a,b)=>Math.abs(a[2]-b[2])<10?a[1]-b[1]:a[2]-b[2]);return res;}
+ /* split a line into words with proportional boxes, so word-level matching works the same as Tesseract */
+ function words(lines){const out=[];lines.forEach(([t,x,y,w,h,s])=>{const parts=String(t).split(/\s+/).filter(Boolean),tot=Math.max(1,String(t).length);let pos=0;
+   parts.forEach(p=>{const i=String(t).indexOf(p,pos),wx=x+w*i/tot,ww=w*p.length/tot;out.push([p,Math.round(wx),y,Math.max(1,Math.round(ww)),h,s]);pos=i+p.length;});});return out;}
+ return {init,read,words,get ok(){return !!det;},get ep(){return EP;}};
+})();
+</script>
+<script>/* ===== Foto bukti: shared helpers (Cek Foto tool + Team E dashboard) ===== */
+const FT=(function(){
+ const te=new TextEncoder(),td=new TextDecoder(),MAGIC=te.encode("TEFOTO1\n"),DBN="teamE_foto",ST="packs";
+ const rnd=n=>{const a=new Uint8Array(n);crypto.getRandomValues(a);return a;};
+ async function key(pw,salt){const b=await crypto.subtle.importKey("raw",te.encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:150000,hash:"SHA-256"},b,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
+ const ok=()=>{try{return !!(window.crypto&&crypto.subtle);}catch(e){return false;}};
+ function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
+ function cat(parts){let n=0;parts.forEach(p=>n+=p.length);const o=new Uint8Array(n);let k=0;parts.forEach(p=>{o.set(p,k);k+=p.length;});return o;}
+ function isPack(u8){if(!u8||u8.length<20)return false;for(let i=0;i<MAGIC.length;i++)if(u8[i]!==MAGIC[i])return false;return true;}
+ function meta(u8){if(!isPack(u8))return null;const n=new DataView(u8.buffer,u8.byteOffset+8,4).getUint32(0,true);try{return JSON.parse(td.decode(u8.subarray(12,12+n)));}catch(e){return null;}}
+ async function encBody(pt,mt,pw){const salt=rnd(16),iv=rnd(12),k=await key(pw,salt),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,pt));const mj=te.encode(JSON.stringify(mt));return cat([MAGIC,u32(mj.length),mj,salt,iv,ct]);}
+ async function seal(head,imgs,mt,pw){let off=0;head.img=head.img||{};const parts=[];imgs.forEach(im=>{head.img[im.h]=[off,im.u8.length,im.w,im.ht,im.k];off+=im.u8.length;parts.push(im.u8);});
+  const hj=te.encode(JSON.stringify(head));mt=Object.assign({v:1,team:"E",n:imgs.length},mt);return encBody(cat([u32(hj.length),hj].concat(parts)),mt,pw);}
+ async function open(u8,pw){const mt=meta(u8);if(!mt)throw new Error("bukan paket foto");const n=new DataView(u8.buffer,u8.byteOffset+8,4).getUint32(0,true),p=12+n,salt=u8.slice(p,p+16),iv=u8.slice(p+16,p+28),ct=u8.subarray(p+28);
+  const k=await key(pw,salt),pt=new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv},k,ct));const hl=new DataView(pt.buffer).getUint32(0,true);
+  return {meta:mt,head:JSON.parse(td.decode(pt.subarray(4,4+hl))),body:pt,base:4+hl};}
+ async function reseal(u8,oldPw,newPw){const mt=meta(u8),n=new DataView(u8.buffer,u8.byteOffset+8,4).getUint32(0,true),p=12+n,k=await key(oldPw,u8.slice(p,p+16));
+  const pt=new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:u8.slice(p+16,p+28)},k,u8.subarray(p+28)));return encBody(pt,mt,newPw);}
+ /* IndexedDB: encrypted packs, shared by every page opened from this computer's files in the same browser */
+ let dbp=null;
+ function db(){if(dbp)return dbp;dbp=new Promise((res,rej)=>{let r;try{r=indexedDB.open(DBN,1);}catch(e){rej(e);return;}r.onupgradeneeded=()=>{r.result.createObjectStore(ST,{keyPath:"id"});};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});dbp.catch(()=>{dbp=null;});return dbp;}
+ const tx=(mode,fn)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction(ST,mode),s=t.objectStore(ST);let out;const q=fn(s);if(q)q.onsuccess=()=>{out=q.result;};t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error);}));
+ const store={all:()=>tx("readonly",s=>s.getAll()),get:id=>tx("readonly",s=>s.get(id)),put:rec=>tx("readwrite",s=>s.put(rec)),del:id=>tx("readwrite",s=>s.delete(id))};
+ let ch=null;try{ch=new BroadcastChannel("teamE_foto");}catch(e){ch=null;}
+ /* OCR text -> compact facts; facts -> verdict (same rules as the one-off reading done by Claude) */
+ const STOP=new Set("muhammad mohammad muhamad ahmad abdul bin binti siti nur nurul putra putri dewi agus sri dan the".split(" "));
+ /* digit runs where the reader mixed in letters ("20a197p9765"): look-alike letters become digits, others become "?" */
+ const CONF={O:"0",o:"0",D:"0",Q:"0",I:"1",l:"1","|":"1",i:"1","!":"1",S:"5",s:"5",B:"8",Z:"2",z:"2",G:"6",g:"9",q:"9",T:"7"};
+ function candsOf(t){const out=new Set(),j=t.replace(/([0-9A-Za-z])[ \-.:](?=[0-9])/g,"$1");
+  for(const m of j.match(/[0-9A-Za-z|!]{9,}/g)||[])for(const w of m.match(/(?:[0-9][0-9A-Za-z|!]?){5,}[0-9]/g)||[]){let d=0;for(const c of w)if(c>="0"&&c<="9")d++;
+   if(w.length>=9&&d>=.7*w.length&&d<w.length)out.add([...w].map(c=>c>="0"&&c<="9"?c:(CONF[c]||"?")).join(""));}
+  return [...out];}
+ function txOf(words){const t=words.map(w=>w[0]).join(" "),dg=t.replace(/(\d)[ \-.](?=\d)/g,"$1");const nums=[...new Set(words.flatMap(w=>String(w[0]).match(/\d{8,}/g)||[]).concat(dg.match(/\d{8,13}/g)||[]))],lw=[...new Set(t.toLowerCase().match(/[a-z]{4,}/g)||[])];return [words.length,nums.join(" "),lw.join(" "),candsOf(t).join(" ")];}
+ /* a number the reader got almost right: at most `mx` digits wrong or unreadable (2 for SID, 1 for phone) */
+ function near(cs,tg,mx){const L=tg.length;for(const c of cs){if(c.length<L)continue;for(let i=0;i+L<=c.length;i++){let bad=0,q=0;for(let k=0;k<L;k++){const a=c[i+k];if(a==="?")q++;else if(a!==tg[k])bad++;if(bad>mx||q>2||bad+q>mx)break;}if(bad<=mx&&q<=2&&bad+q<=mx)return c.slice(i,i+L);}}return null;}
+ function codeOf(t,sid,p9,name,allSids,p9map){if(!t)return [0,"","",""];const nums=t[1]?t[1].split(" "):[],lw=t[2]?t[2].split(" "):[];
+  let x=nums.find(v=>v.includes(sid));if(x)return [1,"","s",sid];
+  if(p9){x=nums.find(v=>v.length>=9&&v.slice(-9)===p9);if(x)return [1,"","p",x];}
+  const toks=(String(name||"").toLowerCase().match(/[a-z]{4,}/g)||[]).filter(w=>!STOP.has(w));for(const k of toks){if(k.length>=5?lw.some(w=>w.includes(k)):lw.includes(k))return [1,"","n",k];}
+  /* almost-right SID or phone, accepted only when no other SID of this sales fits as well */
+  {const cs=nums.concat(t[3]?t[3].split(" "):[]);let f=near(cs,sid,2);
+   if(f&&allSids){for(const o of allSids){if(o===sid||o.length!==sid.length)continue;let d=0;for(let k=0;k<o.length;k++)if(o[k]!==sid[k])d++;if(d<=4&&near(cs,o,2)){f=null;break;}}}
+   if(f)return [1,"","f",f];if(p9){f=near(cs,p9,1);if(f)return [1,"","f",f];}}
+  let o=nums.find(v=>v!==sid&&allSids&&allSids.has(v)),ot=o;if(!o&&p9map){for(const v of nums){if(v.length<9)continue;const s=p9map.get(v.slice(-9));if(s){const c=[...s].find(q=>q!==sid);if(c){o=c;ot=v;break;}}}}
+  if(o){/* same person on another account (same name): the proof is still this customer's */
+   const nm=allSids&&allSids.names,on=nm&&nm.get(o);if(on&&sameName(name,on))return [1,"","n",ot];
+   /* no phone for this customer in Customer Background: the number may simply be the customer's second number (or another line in a call log) */
+   if(!p9)return [2,o,"x",ot];
+   return [4,o,"",ot];}
+  return [t[0]<5?3:2,"","",""];}
+ /* two customer names that clearly belong to the same person */
+ function sameName(a,b){const tk=v=>(String(v||"").toLowerCase().match(/[a-z]{4,}/g)||[]).filter(w=>!STOP.has(w));const A=tk(a),B=tk(b);if(!A.length||!B.length)return false;
+  const raw=v=>String(v||"").toLowerCase().replace(/[^a-z]+/g," ").trim();const ra=raw(a);if(ra.length>=6&&ra.split(" ").length>=2&&ra===raw(b))return true;
+  const sb=new Set(B);return A.filter(w=>sb.has(w)).length>=2;}
+ /* where the matching text sits, as fractions of the crop (for the highlight box) */
+ function hlBox(words,tok,ev,box){if(!tok||!box)return null;const [x0,y0,x1,y1]=box,cw=x1-x0,ch=y1-y0;if(cw<=0||ch<=0)return null;
+  const dig=ev!=="n",w=words.find(v=>dig?String(v[0]).replace(/\D/g,"").includes(tok.replace(/\D/g,"").slice(-9)):String(v[0]).toLowerCase().includes(tok));if(!w)return null;
+  const a0=Math.max(0,(w[1]-x0)/cw),b0=Math.max(0,(w[2]-y0)/ch),a1=Math.min(1,(w[1]+w[3]-x0)/cw),b1=Math.min(1,(w[2]+w[4]-y0)/ch);if(a1-a0<=.005||b1-b0<=.005)return null;
+  const r=v=>Math.round(v*1000)/1000;return [r(a0),r(b0),r(a1-a0),r(b1-b0)];}
+ /* crop: the customer card around the SID/number when one is visible, otherwise the text area */
+ function cropBox(W,H,words,sid,p9){const A1=[],A2=[],A3=[];
+  for(const w of words){const d=String(w[0]).replace(/\D/g,"");if(d.length<9)continue;if(sid&&d.includes(sid))A1.push(w);else if(/20\d{9}/.test(d))A3.push(w);else if(p9&&d.includes(p9))A2.push(w);}
+  const A=A1.length?A1:A3.length?A3:A2;
+  if(A.length){const a=A.reduce((m,v)=>v[1]+v[3]>m[1]+m[3]?v:m),x=a[1],y=a[2],w=a[3],h=a[4],hh=Math.min(Math.max(h,8),60);
+   const L=x-20*hh,R=x+w+20*hh,T=y-8*hh,B=y+h+20*hh,ins=words.filter(v=>v[1]>=L&&v[1]+v[3]<=R&&v[2]>=T&&v[2]+v[4]<=B&&v[4]<=3*hh);
+   const x0=Math.min(x,...ins.map(v=>v[1])),y0=Math.min(y,...ins.map(v=>v[2])),x1=Math.max(x+w,...ins.map(v=>v[1]+v[3])),y1=Math.max(y+h,...ins.map(v=>v[2]+v[4])),p=1.5*hh;
+   const box=[Math.max(0,Math.trunc(x0-p)),Math.max(0,Math.trunc(y0-p)),Math.min(W,Math.trunc(x1+p)),Math.min(H,Math.trunc(y1+p))];
+   return {box,s:Math.min(1,12/hh,640/Math.max(1,box[2]-box[0])),k:"a"};}
+  let ws=words.filter(w=>w[5]>=40&&String(w[0]).trim().length>1);if(!ws.length)ws=words;
+  if(!ws.length)return {box:[0,0,W,H],s:Math.min(1,600/Math.max(W,H)),k:"f"};
+  const x0=Math.max(0,Math.min(...ws.map(w=>w[1]))-12),y0=Math.max(0,Math.min(...ws.map(w=>w[2]))-12),x1=Math.min(W,Math.max(...ws.map(w=>w[1]+w[3]))+12),y1=Math.min(H,Math.max(...ws.map(w=>w[2]+w[4]))+12);
+  const hs=ws.map(w=>w[4]).sort((a,b)=>a-b),n=hs.length,mh=(n%2?hs[(n-1)/2]:(hs[n/2-1]+hs[n/2])/2)||12;
+  return {box:[Math.trunc(x0),Math.trunc(y0),Math.trunc(x1),Math.trunc(y1)],s:Math.min(1,11/mh,760/Math.max(1,x1-x0),900/Math.max(1,y1-y0)),k:"b"};}
+ return {ok,isPack,meta,seal,open,reseal,store,get ch(){return ch;},txOf,codeOf,cropBox,hlBox,sameName};
+})();
+</script>
+<script>/*@A:cfb-c843298014fa.txt@*/
+/* ===== Small .xlsx writer (text, styles, pictures) + Excel password encryption (ECMA-376 agile, AES-256 / SHA-512) ===== */
+const XLW=(function(){
+ const X=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"");
+ const colL=i=>{let s="";i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;};
+ const EMU=9525;
+ /* style ids */
+ const S={def:0,head:1,wrap:2,text:3,bad:4,good:5,warn:6,title:7,note:8,num:9,mute:10};
+ const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<fonts count="8"><font><sz val="10"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="14"/><color rgb="FF1F2A44"/><name val="Calibri"/><family val="2"/></font><font><i/><sz val="9"/><color rgb="FF5B6478"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="10"/><color rgb="FFB91C1C"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="10"/><color rgb="FF166534"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="10"/><color rgb="FF92400E"/><name val="Calibri"/><family val="2"/></font><font><sz val="10"/><color rgb="FF5B6478"/><name val="Calibri"/><family val="2"/></font></fonts>
+<fills count="6"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1F2A44"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFDE2E1"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDCFCE7"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFEF3C7"/><bgColor indexed="64"/></patternFill></fill></fills>
+<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFD5DCEA"/></left><right style="thin"><color rgb="FFD5DCEA"/></right><top style="thin"><color rgb="FFD5DCEA"/></top><bottom style="thin"><color rgb="FFD5DCEA"/></bottom><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="11">
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>
+<xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="5" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="6" fillId="5" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>
+<xf numFmtId="0" fontId="7" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+ const cell=(c,r,v)=>{if(v==null||v==="")return "";const o=typeof v==="object"&&!(v instanceof Date)?v:{v},ref=colL(c)+(r+1),s=o.s?` s="${o.s}"`:"";
+  if(typeof o.v==="number"&&isFinite(o.v))return `<c r="${ref}"${s}><v>${o.v}</v></c>`;if(o.v==null||o.v==="")return o.s?`<c r="${ref}"${s}/>`:"";
+  return `<c r="${ref}"${s} t="inlineStr"><is><t xml:space="preserve">${X(o.v)}</t></is></c>`;};
+ const safeName=(n,used)=>{let b=String(n).replace(/[\[\]:*?/\\]/g," ").replace(/^'+|'+$/g,"").slice(0,31).trim()||"Sheet";if(b.toLowerCase()==="history")b="History 1";let x=b,i=2;while(used.has(x.toLowerCase())){const sf=` (${i++})`;x=b.slice(0,31-sf.length)+sf;}used.add(x.toLowerCase());return x;};
+ /* sheets: [{name, cols:[width], rows:[{h, c:[cells]}], freeze:rowCount, filter:{r0,c0,r1,c1}, merges:["A1:D1"], pics:[{r,c,key,w,h}]}], media: Map key -> {u8,ext} */
+ function build(sheets,media){const f={},used=new Set(),names=sheets.map(s=>safeName(s.name,used));const mKeys=new Map();let mi=0;media.forEach((m,k)=>{mKeys.set(k,`image${++mi}.${m.ext}`);f["xl/media/"+mKeys.get(k)]=m.u8;});
+  const ct=[`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>`];
+  const wbRels=[],defs=[];let dn=0;
+  sheets.forEach((sh,i)=>{const n=i+1;ct.push(`<Override PartName="/xl/worksheets/sheet${n}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`);
+   wbRels.push(`<Relationship Id="rId${n}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${n}.xml"/>`);
+   const cols=(sh.cols||[]).map((w,j)=>`<col min="${j+1}" max="${j+1}" width="${w}" customWidth="1"/>`).join("");
+   const rows=sh.rows.map((row,r)=>{const cs=(row.c||[]).map((v,c)=>cell(c,r,v)).join("");return `<row r="${r+1}"${row.h?` ht="${row.h}" customHeight="1"`:""}>${cs}</row>`;}).join("");
+   const fr=sh.freeze?`<pane ySplit="${sh.freeze}" topLeftCell="A${sh.freeze+1}" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A${sh.freeze+1}" sqref="A${sh.freeze+1}"/>`:"";
+   const flt=sh.filter?`${colL(sh.filter.c0)}${sh.filter.r0+1}:${colL(sh.filter.c1)}${sh.filter.r1+1}`:"";
+   if(flt)defs.push(`<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${X(names[i].replace(/'/g,"''"))}'!$${colL(sh.filter.c0)}$${sh.filter.r0+1}:$${colL(sh.filter.c1)}$${sh.filter.r1+1}</definedName>`);
+   const mg=(sh.merges||[]).length?`<mergeCells count="${sh.merges.length}">${sh.merges.map(m=>`<mergeCell ref="${m}"/>`).join("")}</mergeCells>`:"";
+   const hasPic=(sh.pics||[]).length;
+   f[`xl/worksheets/sheet${n}.xml`]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0"${i===0?' tabSelected="1"':""}>${fr}</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/>${cols?`<cols>${cols}</cols>`:""}<sheetData>${rows}</sheetData>${flt?`<autoFilter ref="${flt}"/>`:""}${mg}<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>${hasPic?`<drawing r:id="rId1"/>`:""}</worksheet>`;
+   if(hasPic){dn++;ct.push(`<Override PartName="/xl/drawings/drawing${dn}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`);
+    f[`xl/worksheets/_rels/sheet${n}.xml.rels`]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing${dn}.xml"/></Relationships>`;
+    const rid=new Map(),rels=[];const anc=sh.pics.map((p,k)=>{if(!rid.has(p.key)){rid.set(p.key,"rId"+(rid.size+1));rels.push(`<Relationship Id="${rid.get(p.key)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${mKeys.get(p.key)}"/>`);}
+     const ox=(p.ox||4)*EMU,oy=(p.oy||4)*EMU;
+     return `<xdr:twoCellAnchor editAs="twoCell"><xdr:from><xdr:col>${p.c}</xdr:col><xdr:colOff>${ox}</xdr:colOff><xdr:row>${p.r}</xdr:row><xdr:rowOff>${oy}</xdr:rowOff></xdr:from><xdr:to><xdr:col>${p.c}</xdr:col><xdr:colOff>${ox+Math.round(p.w*EMU)}</xdr:colOff><xdr:row>${p.r}</xdr:row><xdr:rowOff>${oy+Math.round(p.h*EMU)}</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${k+2}" name="Foto ${k+1}"${p.alt?` descr="${X(p.alt)}"`:""}/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="${rid.get(p.key)}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${Math.round(p.w*EMU)}" cy="${Math.round(p.h*EMU)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>`;}).join("");
+    f[`xl/drawings/drawing${dn}.xml`]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${anc}</xdr:wsDr>`;
+    f[`xl/drawings/_rels/drawing${dn}.xml.rels`]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${rels.join("")}</Relationships>`;}});
+  ct.push("</Types>");
+  wbRels.push(`<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`);
+  f["[Content_Types].xml"]=ct.join("");
+  f["_rels/.rels"]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>`;
+  const now=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  f["docProps/core.xml"]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>Arsip foto bukti</dc:title><dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified></cp:coreProperties>`;
+  f["docProps/app.xml"]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>Microsoft Excel</Application></Properties>`;
+  f["xl/workbook.xml"]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${names.map((nm,i)=>`<sheet name="${X(nm)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets>${defs.length?`<definedNames>${defs.join("")}</definedNames>`:""}</workbook>`;
+  f["xl/_rels/workbook.xml.rels"]=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${wbRels.join("")}</Relationships>`;
+  f["xl/styles.xml"]=styles;
+  const te=new TextEncoder(),z={};for(const k in f){const v=f[k];z[k]=typeof v==="string"?[te.encode(v),{level:6}]:[v,{level:0}];}
+  return fflate.zipSync(z);}
+ return {build,S,colL};})();
+
+const XLE=(function(){
+ const C=globalThis.crypto.subtle,rnd=n=>globalThis.crypto.getRandomValues(new Uint8Array(n));
+ const cat=(...a)=>{const n=a.reduce((s,x)=>s+x.length,0),o=new Uint8Array(n);let p=0;a.forEach(x=>{o.set(x,p);p+=x.length;});return o;};
+ const u32=v=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,v,true);return b;};
+ const sha=async(...a)=>new Uint8Array(await C.digest("SHA-512",cat(...a)));
+ const b64=u8=>{let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s);};
+ const fit=(h,n)=>{if(h.length>=n)return h.slice(0,n);const o=new Uint8Array(n).fill(0x36);o.set(h);return o;};
+ /* AES-CBC without padding: input length is a multiple of 16; WebCrypto adds one padding block which is dropped */
+ async function aes(keyRaw,iv,data){const k=keyRaw instanceof CryptoKey?keyRaw:await C.importKey("raw",keyRaw,"AES-CBC",false,["encrypt"]);const out=new Uint8Array(await C.encrypt({name:"AES-CBC",iv},k,data));return out.slice(0,data.length);}
+ const BK={hk:[0x5f,0xb2,0xad,0x01,0x0c,0xb9,0xe1,0xf6],hv:[0xa0,0x67,0x7f,0x02,0xb2,0x2c,0x84,0x33],key:[0x14,0x6e,0x0b,0xe7,0xab,0xac,0xd0,0xd6],vi:[0xfe,0xa7,0xd2,0x76,0x3b,0x4b,0x9e,0x79],vv:[0xd7,0xaa,0x0f,0x6d,0x30,0x61,0x34,0x4e]};
+ const SPIN=100000;
+ async function encrypt(zip,password,onp){onp=onp||(()=>{});
+  const pkgKey=rnd(32),pSalt=rnd(16),kSalt=rnd(16);
+  /* password hash (UTF-16LE), spun 100,000 times */
+  const pw=new Uint8Array(password.length*2);for(let i=0;i<password.length;i++){const c=password.charCodeAt(i);pw[i*2]=c&255;pw[i*2+1]=c>>8;}
+  let h=await sha(kSalt,pw);for(let i=0;i<SPIN;i++){h=await sha(u32(i),h);if(i%5000===0)onp("key",i/SPIN);}
+  const kOf=async bk=>fit(await sha(h,new Uint8Array(bk)),32);
+  /* package: 4096-byte segments, IV = SHA512(salt + segment index) */
+  const pk=await C.importKey("raw",pkgKey,"AES-CBC",false,["encrypt"]),N=Math.ceil(zip.length/4096),encPkg=new Uint8Array(8+Math.ceil(zip.length/16)*16);
+  new DataView(encPkg.buffer).setUint32(0,zip.length,true);let pos=8;
+  for(let i=0;i<N;i++){let seg=zip.subarray(i*4096,Math.min(zip.length,(i+1)*4096));if(seg.length%16){const t=new Uint8Array(seg.length+16-seg.length%16);t.set(seg);seg=t;}
+   const e=await aes(pk,fit(await sha(pSalt,u32(i)),16),seg);encPkg.set(e,pos);pos+=e.length;if(i%200===0)onp("pkg",i/N);}
+  /* data integrity */
+  const hmacKey=rnd(64),hk=await C.importKey("raw",hmacKey,{name:"HMAC",hash:"SHA-512"},false,["sign"]),hmac=new Uint8Array(await C.sign("HMAC",hk,encPkg));
+  const encHK=await aes(pk,fit(await sha(pSalt,new Uint8Array(BK.hk)),16),hmacKey),encHV=await aes(pk,fit(await sha(pSalt,new Uint8Array(BK.hv)),16),hmac);
+  /* key + verifier */
+  const vin=rnd(16),encKey=await aes(await kOf(BK.key),kSalt,pkgKey),encVI=await aes(await kOf(BK.vi),kSalt,vin),encVV=await aes(await kOf(BK.vv),kSalt,await sha(vin));
+  const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<encryption xmlns="http://schemas.microsoft.com/office/2006/encryption" xmlns:p="http://schemas.microsoft.com/office/2006/keyEncryptor/password" xmlns:c="http://schemas.microsoft.com/office/2006/keyEncryptor/certificate"><keyData saltSize="16" blockSize="16" keyBits="256" hashSize="64" cipherAlgorithm="AES" cipherChaining="ChainingModeCBC" hashAlgorithm="SHA512" saltValue="${b64(pSalt)}"/><dataIntegrity encryptedHmacKey="${b64(encHK)}" encryptedHmacValue="${b64(encHV)}"/><keyEncryptors><keyEncryptor uri="http://schemas.microsoft.com/office/2006/keyEncryptor/password"><p:encryptedKey spinCount="${SPIN}" saltSize="16" blockSize="16" keyBits="256" hashSize="64" cipherAlgorithm="AES" cipherChaining="ChainingModeCBC" hashAlgorithm="SHA512" saltValue="${b64(kSalt)}" encryptedVerifierHashInput="${b64(encVI)}" encryptedVerifierHashValue="${b64(encVV)}" encryptedKeyValue="${b64(encKey)}"/></keyEncryptor></keyEncryptors></encryption>`;
+  const info=cat(new Uint8Array([4,0,4,0,0x40,0,0,0]),new TextEncoder().encode(xml));
+  const cf=CFB.utils.cfb_new();CFB.utils.cfb_add(cf,"EncryptionInfo",info);CFB.utils.cfb_add(cf,"EncryptedPackage",encPkg);
+  onp("done",1);const out=CFB.write(cf,{type:"array"});return out instanceof Uint8Array?out:new Uint8Array(out);}
+ return {encrypt};})();
+
+/* ================= Cek Foto Bukti · Team E ================= */
+(function(){
+const $=s=>document.querySelector(s),esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const te=new TextEncoder(),td=new TextDecoder();
+const DEF_PEOPLE=(window.__OCR_PEOPLE||[]),CB_LSK="teamE_cb_v1";
+const MN=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"],ml=ym=>ym?`${MN[+ym.slice(5)-1]} ${ym.slice(2,4)}`:"–";
+const num=n=>Number(n).toLocaleString("id-ID");
+let PW=null,D=null,PEOPLE=DEF_PEOPLE.slice();
+const KN=new Map();           /* hash -> tx facts, for photos already read and stored in a pack */
+let PACKS=[];                 /* metas of packs in this browser */
+const FILES=[];               /* {file,u8,ss,sheets:[{name,path,...}]} */
+let SHEETS=[];                /* candidate sheets */
+const SESSION=[];             /* pack ids made in this session */
+let RUN=null,LASTRES=[];                 /* running state */
+const CROPU=new Map();        /* hash -> object URL of crops flagged in this session */
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+
+/* ---------- unlock ---------- */
+/* NOPW: a team chose to use this tool without any password. Readings are then stored with a fixed key and the Excel is not locked. */
+const NOPW=false,NOPW_KEY="cek-foto-tanpa-password";
+async function openNoPw(){if(!FT.ok()){$("#lock").hidden=false;$("#lockErr").textContent="Browser ini tidak mendukung penyimpanan aman. Buka file ini di Google Chrome.";return;}
+ let recs=[];try{recs=await FT.store.all();}catch(e){recs=[];}PW=NOPW_KEY;await loadKnown(recs);
+ $("#lock").hidden=true;$("#main").hidden=false;renderPacks();renderSheets();
+ const wh=$("#who");wh.classList.add("off");wh.innerHTML=`<i></i>Alat ini dipakai tanpa password. Hasil tersimpan di Chrome ini, ikut masuk ke tab Kontak dashboard Team E saat dashboard dibuka di Chrome yang sama (mode Data TL), dan bisa dijadikan Excel atau cadangan .tefoto.`;}
+async function tryDash(pw){let l=null;try{l=JSON.parse(localStorage.getItem(CB_LSK)||"null");}catch(e){}if(!l||!l.blob)return null;
+ const e=l.blob,k=await crypto.subtle.importKey("raw",te.encode(pw),"PBKDF2",false,["deriveKey"]).then(b=>crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(e.salt),iterations:150000,hash:"SHA-256"},b,{name:"AES-GCM",length:256},false,["decrypt"]));
+ const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(e.iv)},k,unb64(e.ct));const o=JSON.parse(td.decode(pt));return JSON.parse(fflate.strFromU8(fflate.unzlibSync(unb64(o.z))));}
+async function unlock(ev){ev.preventDefault();const pw=$("#pw").value,err=$("#lockErr");if(!pw){err.textContent="Isi password dulu.";return;}
+ if(!FT.ok()){err.textContent="Browser ini tidak mendukung enkripsi. Buka file ini di Google Chrome.";return;}
+ err.textContent="Membuka…";let verified=false,hasDash=false,recs=[];
+ try{recs=await FT.store.all();}catch(e){recs=[];}
+ try{const d=await tryDash(pw);if(d){D=d;verified=true;}}catch(e){hasDash=true;}
+ if(!verified&&recs.length){try{await FT.open(new Uint8Array(recs[0].bytes),pw);verified=true;}catch(e){err.textContent="Password salah. Pakai password Data TL di dashboard Team E.";$("#pw").select();return;}}
+ if(!verified&&hasDash){err.textContent="Password salah. Pakai password Data TL di dashboard Team E.";$("#pw").select();return;}
+ if(!verified){const p2=$("#pw2");if(p2.hidden){p2.hidden=false;$("#pw2l").hidden=false;err.textContent="Belum ada data dashboard di browser ini, jadi password tidak bisa dicek. Ketik ulang password Data TL untuk konfirmasi.";p2.focus();return;}
+  if(p2.value!==pw){err.textContent="Kedua password tidak sama.";return;}}
+ PW=pw;if(D&&D.people){const ns=[...new Set([...(D.members||[]),...D.people.map(p=>p.n)])];if(ns.length)PEOPLE=ns;}
+ err.textContent="Memuat foto yang sudah pernah dibaca…";await loadKnown(recs);
+ $("#lock").hidden=true;$("#main").hidden=false;renderPacks();renderSheets();
+ const wh=$("#who");wh.classList.toggle("off",!D);wh.innerHTML=D?`<i></i>Terhubung dengan dashboard Team E di Chrome ini (${PEOPLE.length} sales). Hasil akan masuk otomatis.`:`<i></i>Belum terhubung dengan tab Kontak dashboard Team E di Chrome ini. Hasil tetap tersimpan di sini dan bisa dijadikan Excel atau cadangan .tefoto.`;}
+async function loadKnown(recs){KN.clear();PACKS=[];PREV.clear();HIDX.clear();const heads=[];for(const r of recs){const u8=new Uint8Array(r.bytes),meta=r.meta||FT.meta(u8);PACKS.push({id:r.id,meta,size:u8.length,at:r.at});
+  try{const o=await FT.open(u8,PW),txm=o.head.tx||{};Object.keys(o.head.img||{}).forEach(h=>{if(txm[h])KN.set(h,txm[h]);if(!HIDX.has(h))HIDX.set(h,r.id);});heads.push([meta.made||0,o.head]);}catch(e){}}
+ PACKS.sort((a,b)=>(a.meta.made||0)-(b.meta.made||0));
+ heads.sort((a,b)=>a[0]-b[0]).forEach(([made,h])=>(h.sheets||[]).forEach(sx=>{const key=sx.pn+"|"+sx.ym;let e=PREV.get(key);if(!e)PREV.set(key,e={ph:new Map(),fl:new Map(),nm:new Map(),at:0,flAt:0});
+  (sx.rows||[]).forEach(r=>{e.ph.set(r[0],[r[1],sx.at||made]);});e.at=Math.max(e.at,sx.at||made);if(sx.data&&sx.data.recs){sx.data.recs.forEach(x=>{e.fl.set(x[0],[x[3],sx.at||made]);if(x[1])e.nm.set(x[0],x[1]);});e.flAt=Math.max(e.flAt,sx.at||made);}}));}
+/* ---------- photos that look like another customer's proof (the same screenshot cropped or taken again) ----------
+   Compared by the customer-specific words and numbers read in the photo (words common to every screenshot are ignored). */
+/* ---------- what changed since the last reading of the same sales and month ---------- */
+const PREV=new Map(),HIDX=new Map();
+const dShort=t=>{const d=new Date(t);return isNaN(d)?"":`${d.getDate()} ${MN[d.getMonth()]}`;};
+const CHN=["Telp","WA","Chat"];
+function sheetChanges(s){if(!s.who||!/^\d{4}-\d{2}$/.test(s.ym)||!s.hashed)return [];const e=PREV.get(s.who+"|"+s.ym),out=[];
+ const dp=D&&D.people.find(x=>x.n===s.who),dsh=dp&&dp.sheets.find(x=>x.ym===s.ym&&x.use!==0);
+ const dF=new Map();if(dsh)dsh.rows.forEach(r=>{dF.set(dp.ids[r[0]],[r[2],0]);});
+ const prevPh=e?e.ph:new Map();if(dsh&&!e)dsh.rows.forEach(r=>{if(r.length>3&&r[3]!=null&&r[3]>=0&&dp.img[r[3]])prevPh.set(dp.ids[r[0]],[dp.img[r[3]][0],0]);});
+ const prevF=e&&e.fl.size?e.fl:dF;
+ prevPh.forEach(([h,at],sid)=>{const rec=s.recs.get(sid);if(!rec){out.push({sid,k:"gone",h,at});return;}const m=s.want.get(sid),x=m&&s.hashed.get(m);
+  if(!x)out.push({sid,k:"del",h,at});else if(x.h!==h)out.push({sid,k:"rep",h,cur:x.h,at});});
+ prevF.forEach(([f,at],sid)=>{const rec=s.recs.get(sid);if(!rec||f==null||f<0||rec.f<0)return;const a=decF(f),b=decF(rec.f),ca=a.ct===1||a.pc===1||a.wa===1||a.cr===1,cb=b.ct===1||b.pc===1||b.wa===1||b.cr===1;
+  if(ca&&!cb){out.push({sid,k:"unc",at});return;}const lost=[a.pc,a.wa,a.cr].map((v,i)=>v===1&&[b.pc,b.wa,b.cr][i]!==1?CHN[i]:null).filter(Boolean);if(cb&&lost.length)out.push({sid,k:"chn",lost,at});});
+ return out;}
+const CHGL={gone:"customer hilang dari sheet",del:"foto bukti dihapus",rep:"foto bukti diganti",unc:"contacted diubah jadi uncontacted",chn:"channel dicabut"};
+const chgTxt=c=>`${c.k==="chn"?`channel ${c.lost.join("+")} dicabut`:CHGL[c.k]} setelah dicek${c.at?" "+dShort(c.at):""}`;
+
+/* ---------- xlsx ---------- */
+const xunesc=s=>s.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCharCode(+n)).replace(/&amp;/g,"&");
+const attr=(tag,a)=>{const m=tag.match(new RegExp("\\s"+a+'="([^"]*)"'));return m?xunesc(m[1]):null;};
+const pjoin=(base,t)=>{if(t.startsWith("/"))return t.slice(1);const st=base.split("/").filter(Boolean);t.split("/").forEach(x=>{if(x==="..")st.pop();else if(x&&x!==".")st.push(x);});return st.join("/");};
+const dirOf=p=>p.split("/").slice(0,-1).join("/"),relPath=path=>(dirOf(path)?dirOf(path)+"/":"")+"_rels/"+path.split("/").pop()+".rels";
+const relsOf=(z,path)=>{const x=z[relPath(path)],o={};if(!x)return o;(td.decode(x).match(/<Relationship\b[^>]*>/g)||[]).forEach(t=>{o[attr(t,"Id")]=pjoin(dirOf(path),attr(t,"Target"));});return o;};
+const unz=(F,f)=>fflate.unzipSync(F.u8,{filter:x=>f(x.name)});
+const colIdx=ref=>{let n=0;for(const ch of ref)n=n*26+(ch.charCodeAt(0)-64);return n-1;};
+const hn=x=>String(x==null?"":x).toLowerCase().replace(/[^a-z]/g,"");
+const bv=v=>{if(v==null)return 2;const s=String(v).trim().toLowerCase();if(["1","1.0","true","y","yes","ya","✓","v","☑"].includes(s))return 1;if(["0","0.0","false","n","no","tidak","☐"].includes(s))return 0;return 2;};
+function guessYm(nm){const L=String(nm||"").toLowerCase(),MS=[["jan"],["feb"],["mar"],["apr"],["mei","may"],["jun"],["jul"],["agu","aug"],["sep"],["okt","oct"],["nov"],["des","dec"]];let mo=-1;
+ MS.forEach((a,i)=>{if(a.some(k=>new RegExp("(^|[^a-z])"+k).test(L)))mo=i;});const y=(L.match(/20(2\d)/)||L.match(/(?:^|[^0-9])(2\d)(?:[^0-9]|$)/)||[])[1];
+ return mo>=0?`20${y||String(new Date().getFullYear()).slice(2)}-${String(mo+1).padStart(2,"0")}`:"";}
+function sheetRows(xml,ss){const rows=[];(xml.match(/<row\b[^>]*>[\s\S]*?<\/row>/g)||[]).forEach(rx=>{const ri=+attr(rx.slice(0,rx.indexOf(">")+1),"r")-1,arr=[];
+  (rx.match(/<c\b[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g)||[]).forEach(cx=>{const head=cx.slice(0,cx.indexOf(">")+1),ref=attr(head,"r")||"",col=colIdx(ref.replace(/\d+/g,"")),t=attr(head,"t");let v=null;
+   const vm=cx.match(/<v>([\s\S]*?)<\/v>/);if(t==="s"&&vm)v=ss[+vm[1]];else if(t==="inlineStr"){const im=cx.match(/<t[^>]*>([\s\S]*?)<\/t>/);v=im?xunesc(im[1]):null;}else if(vm)v=xunesc(vm[1]);
+   if(v!=null&&String(v).trim()!=="")arr[col]=String(v);});rows[ri]=arr;});for(let i=0;i<rows.length;i++)if(!rows[i])rows[i]=[];return rows;}
+async function sha16(u8){const b=new Uint8Array(await crypto.subtle.digest("SHA-1",u8));return [...b.slice(0,8)].map(x=>x.toString(16).padStart(2,"0")).join("");}
+async function addFiles(list){const st=$("#fileSt");for(const file of list){if(!/\.xlsx$/i.test(file.name)){st.textContent=`${file.name} dilewati: bukan file .xlsx.`;continue;}
+  st.textContent=`Membuka ${file.name}…`;await tick();
+  try{const F={file,u8:new Uint8Array(await file.arrayBuffer())};const z=unz(F,n=>n==="xl/workbook.xml"||n==="xl/_rels/workbook.xml.rels"||n==="xl/sharedStrings.xml");
+   F.ss=z["xl/sharedStrings.xml"]?(td.decode(z["xl/sharedStrings.xml"]).match(/<si>[\s\S]*?<\/si>/g)||[]).map(si=>xunesc((si.match(/<t[^>]*>([\s\S]*?)<\/t>/g)||[]).map(t=>t.replace(/<[^>]+>/g,"")).join(""))):[];
+   const rels=relsOf(z,"xl/workbook.xml"),wb=td.decode(z["xl/workbook.xml"]);const who=PEOPLE.find(p=>file.name.toLowerCase().includes(p.toLowerCase()))||"";
+   const shs=(td.decode(z["xl/workbook.xml"]).match(/<sheet\b[^>]*>/g)||[]).map(t=>({name:attr(t,"name"),path:rels[attr(t,"r:id")]})).filter(x=>x.path);void wb;FILES.push(F);
+   for(const sh of shs){st.textContent=`${file.name}: memeriksa sheet "${sh.name}"…`;await tick();const r=await scanSheet(F,sh);if(r){r.who=who;r.ym=guessYm(sh.name);SHEETS.push(r);}}
+   st.textContent=`${file.name} dibuka.`;}
+  catch(e){st.textContent=`${file.name} tidak bisa dibaca: ${e.message}`;}}
+ F_sort();renderSheets();}
+const tick=()=>new Promise(r=>setTimeout(r,0));
+/* Header names differ between teams: find the needed columns by many names, ignore the rest */
+const COLK={
+ sid:["sid","customerid","custid","userid","idcustomer","idnasabah","accountid","clientid","uid"],
+ name:["name","nama","customername","namacustomer","namanasabah","fullname","namalengkap","clientname"],
+ vip:["viplevel","vip","level","viptier"],
+ ph:["phonenumber","phone","nohp","nomorhp","nohandphone","nomorhandphone","notelp","notelepon","nomortelepon","nomertelephone","nomortelp","telephone","telepon","handphone","hp","mobile","mobilenumber","mobilephone","nowa","nomorwa","whatsappnumber","phoneno","contactnumber"],
+ pc:["phonecall","call","calls","telp","panggilan","telepon1"],
+ wa:["whatsapp","wa","whatsappchat"],
+ cr:["chatroom","chat","livechat","inappchat"],
+ ct:["contacted","kontak","dihubungi","contactstatus","statuskontak","contact"],
+ pf:["contactedproof","proof","bukti","buktikontak","fotobukti","buktifoto","screenshot","ss","contactproof","evidence"]};
+const isSid=v=>/^\d{8,12}$/.test(String(v==null?"":v).trim().replace(/\.0$/,""));
+function findCols(H){const used=new Set(),col={};
+ const pick=(k,loose)=>{for(const key of COLK[k]){const i=H.findIndex((h,j)=>!used.has(j)&&h===key);if(i>=0)return i;}
+  if(loose)for(const key of COLK[k]){if(key.length<4)continue;const i=H.findIndex((h,j)=>!used.has(j)&&h&&h.startsWith(key));if(i>=0)return i;}return -1;};
+ /* exact names first (so "Contacted Proof" is not taken as "Contacted"), then names that start with a known word */
+ ["sid","pf","ph","name","vip","pc","wa","cr","ct"].forEach(k=>{const i=pick(k,false);col[k]=i;if(i>=0)used.add(i);});
+ ["sid","pf","ph","name","vip","pc","wa","cr","ct"].forEach(k=>{if(col[k]<0){const i=pick(k,true);col[k]=i;if(i>=0)used.add(i);}});
+ return col;}
+async function scanSheet(F,sh){let z=unz(F,n=>n===sh.path||n===relPath(sh.path));if(!z[sh.path])return null;const xml=td.decode(z[sh.path]),rows=sheetRows(xml,F.ss);
+ /* header row: has a SID-like name; otherwise the row above the first block of SID-looking numbers */
+ let hi=-1,col=null;
+ for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i];if(!r||!r.length)continue;const c=findCols(r.map(hn));if(c.sid>=0&&rows.slice(i+1,i+30).some(x=>x&&isSid(x[c.sid]))){hi=i;col=c;break;}}
+ if(!col){for(let i=0;i<Math.min(rows.length,60)&&!col;i++){const r=rows[i]||[];for(let j=0;j<r.length;j++){if(isSid(r[j])&&rows.slice(i,i+10).filter(x=>x&&isSid(x[j])).length>=5){hi=i-1;col=findCols((rows[hi]||[]).map(hn));col.sid=j;break;}}}}
+ if(!col||col.sid<0)return null;
+ /* a list of customers needs a contact column or proof pictures; plain SID logs (daily records) are skipped later if they have neither */
+ const recs=new Map();rows.slice(hi+1).forEach(r=>{if(!r)return;const sid=String(r[col.sid]==null?"":r[col.sid]).trim().replace(/\.0$/,"");if(!/^\d{8,12}$/.test(sid))return;
+  const phr=col.ph>=0&&r[col.ph]!=null?String(r[col.ph]).trim():"",ph0=phr.replace(/\.0$/,""),ph=/^8\d{7,12}$/.test(ph0)?"0"+ph0:ph0,pd=/e\+/i.test(ph0)?"":ph0.replace(/\D/g,"");
+  const hasCh=col.pc>=0||col.wa>=0||col.cr>=0;
+  recs.set(sid,{ph,name:col.name>=0&&r[col.name]!=null?String(r[col.name]).trim():"",vip:col.vip>=0&&r[col.vip]!=null?String(r[col.vip]).trim():"",p9:pd.length>=9?pd.slice(-9):"",
+   f:hasCh||col.ct>=0?(col.pc>=0?bv(r[col.pc]):2)*27+(col.wa>=0?bv(r[col.wa]):2)*9+(col.cr>=0?bv(r[col.cr]):2)*3+(col.ct>=0?bv(r[col.ct]):2):-1});});
+ if(!recs.size)return null;
+ const sidAt=ri=>{for(let k=ri;k>=Math.max(hi+1,ri-2);k--){const row=rows[k];if(row&&isSid(row[col.sid]))return String(row[col.sid]).trim().replace(/\.0$/,"");}return "";};
+ const want=new Map(),wcol=new Map(),put=(sid,media,c)=>{if(!sid||!media||!recs.has(sid))return;if(!/\.(png|jpe?g|gif|webp|bmp)$/i.test(media))return;
+  const better=!want.has(sid)||(col.pf>=0&&c===col.pf&&wcol.get(sid)!==col.pf);if(better){want.set(sid,media);wcol.set(sid,c);}};
+ /* 1) pictures floating over the sheet (anchored to a cell) */
+ const sr=relsOf(z,sh.path),drs=Object.values(sr).filter(x=>/drawings\/drawing/.test(x));
+ if(drs.length){const z2=unz(F,n=>drs.includes(n)||drs.some(d=>n===relPath(d)));
+  drs.forEach(d=>{if(!z2[d])return;const x=td.decode(z2[d]),rr=relsOf(z2,d);(x.match(/<(\w+:)?(?:twoCellAnchor|oneCellAnchor|absoluteAnchor)\b[\s\S]*?<\/(\w+:)?(?:twoCellAnchor|oneCellAnchor|absoluteAnchor)>/g)||[]).forEach(a=>{const fr=a.match(/<(?:\w+:)?from>\s*<(?:\w+:)?col>(\d+)<\/(?:\w+:)?col>[\s\S]*?<(?:\w+:)?row>(\d+)<\/(?:\w+:)?row>/),to=a.match(/<(?:\w+:)?to>\s*<(?:\w+:)?col>\d+<\/(?:\w+:)?col>[\s\S]*?<(?:\w+:)?row>(\d+)<\/(?:\w+:)?row>/),em=a.match(/\b\w+:embed="([^"]+)"/);if(!fr||!em)return;
+   let ri=+fr[2];if(!isSid((rows[ri]||[])[col.sid])&&to){const mid=Math.round((+fr[2]+(+to[1]))/2);if(isSid((rows[mid]||[])[col.sid]))ri=mid;}
+   put(sidAt(ri),rr[em[1]],+fr[1]);});});}
+ /* 2) pictures placed inside a cell: Excel 365 ("Place in cell") and WPS (DISPIMG) */
+ const vmCells=[],dispCells=[];(xml.match(/<c\b[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g)||[]).forEach(cx=>{const head=cx.slice(0,cx.indexOf(">")+1),ref=attr(head,"r")||"",m=ref.match(/^([A-Z]+)(\d+)$/);if(!m)return;const c=colIdx(m[1]),r=+m[2]-1;
+  const vm=attr(head,"vm");if(vm)vmCells.push([r,c,+vm]);const fm=cx.match(/DISPIMG\(\s*(?:&quot;|")([^"&]+)(?:&quot;|")/);if(fm)dispCells.push([r,c,fm[1]]);});
+ if(vmCells.length){const names=["xl/metadata.xml","xl/richData/rdrichvalue.xml","xl/richData/rdrichvaluestructure.xml","xl/richData/richValueRel.xml","xl/richData/_rels/richValueRel.xml.rels"],z3=unz(F,n=>names.includes(n));
+  if(z3["xl/metadata.xml"]&&z3["xl/richData/rdrichvalue.xml"]&&z3["xl/richData/richValueRel.xml"]){const md=td.decode(z3["xl/metadata.xml"]);
+   const fut=((md.match(/<futureMetadata\b[^>]*name="XLRICHVALUE"[\s\S]*?<\/futureMetadata>/)||[""])[0].match(/<bk>[\s\S]*?<\/bk>/g)||[]).map(b=>+((b.match(/<xlrd:rvb\s+i="(\d+)"/)||[])[1]||-1));
+   const vbk=((md.match(/<valueMetadata\b[\s\S]*?<\/valueMetadata>/)||[""])[0].match(/<bk>[\s\S]*?<\/bk>/g)||[]).map(b=>{const m=b.match(/<rc\s+t="(\d+)"\s+v="(\d+)"/);return m?+m[2]:-1;});
+   const st=z3["xl/richData/rdrichvaluestructure.xml"]?(td.decode(z3["xl/richData/rdrichvaluestructure.xml"]).match(/<s\b[\s\S]*?<\/s>/g)||[]).map(s=>(s.match(/<k\b[^>]*n="([^"]+)"/g)||[]).map(k=>attr(k,"n"))):[];
+   const rv=(td.decode(z3["xl/richData/rdrichvalue.xml"]).match(/<rv\b[\s\S]*?<\/rv>/g)||[]).map(x=>{const s=+(attr(x.slice(0,x.indexOf(">")+1),"s")||0),vs=(x.match(/<v[^>]*>([\s\S]*?)<\/v>/g)||[]).map(v=>v.replace(/<[^>]+>/g,"")),keys=st[s]||[],ki=keys.indexOf("_rvRel:LocalImageIdentifier");return +(vs[ki>=0?ki:0]);});
+   const rel=(td.decode(z3["xl/richData/richValueRel.xml"]).match(/<rel\b[^>]*>/g)||[]).map(t=>attr(t,"r:id")),rr=relsOf(z3,"xl/richData/richValueRel.xml");
+   vmCells.forEach(([r,c,vm])=>{const fi=vbk[vm-1];const ri=fi>=0?fut[fi]:-1;const li=ri>=0?rv[ri]:-1;const id=li>=0?rel[li]:null;if(id&&rr[id])put(sidAt(r),rr[id],c);});}}
+ if(dispCells.length){const z4=unz(F,n=>n==="xl/cellimages.xml"||n==="xl/_rels/cellimages.xml.rels");if(z4["xl/cellimages.xml"]){const x=td.decode(z4["xl/cellimages.xml"]),rr=relsOf(z4,"xl/cellimages.xml"),byName=new Map();
+   (x.match(/<etc:cellImage>[\s\S]*?<\/etc:cellImage>/g)||[]).forEach(ci=>{const nm=(ci.match(/<xdr:cNvPr\b[^>]*name="([^"]+)"/)||[])[1],em=(ci.match(/r:embed="([^"]+)"/)||[])[1];if(nm&&em&&rr[em])byName.set(nm,rr[em]);});
+   dispCells.forEach(([r,c,id])=>put(sidAt(r),byName.get(id),c));}}
+ const hasContact=col.pc>=0||col.wa>=0||col.cr>=0||col.ct>=0;if(!hasContact&&!want.size)return null;
+ return {F,name:sh.name,path:sh.path,recs,want,cols:col,nImg:new Set(want.values()).size,hashed:null,newN:null,on:false};}
+function F_sort(){SHEETS.forEach(s=>{if(s.on==null)s.on=false;});}
+async function hashSheet(s){if(s.hashed)return;const medias=new Set(s.want.values()),z=unz(s.F,n=>medias.has(n)),h=new Map();let k=0;
+ for(const m of medias){if(!z[m])continue;h.set(m,{h:await sha16(z[m]),mime:/\.png$/i.test(m)?"image/png":/\.gif$/i.test(m)?"image/gif":/\.webp$/i.test(m)?"image/webp":/\.bmp$/i.test(m)?"image/bmp":"image/jpeg"});if(++k%50===0)await tick();}
+ s.hashed=h;s.newN=[...h.values()].filter(x=>!KN.has(x.h)).length;}
+function inDash(pn,ym){if(!D)return false;const p=D.people.find(x=>x.n===pn);return !!(p&&p.sheets.some(x=>x.ym===ym&&x.use!==0));}
+
+/* ---------- render ---------- */
+function renderSheets(){try{xlSrc();}catch(e){}const box=$("#sheets");if(!SHEETS.length){box.innerHTML="";$("#go").disabled=true;$("#selInfo").textContent="";return;}
+ box.innerHTML=`<div class="tw"><table><thead><tr><th style="width:28px"></th><th>Sheet</th><th>Sales</th><th>Bulan</th><th class="r">Foto</th><th>Status</th></tr></thead><tbody>${SHEETS.map((s,i)=>{
+  if(s.hashed&&s.who&&s.ym)s.chg=sheetChanges(s);const cg=s.chg&&s.chg.length?`<span class="tag bad" title="Dibanding pembacaan sebelumnya">⚠ ${num(s.chg.length)} berubah sejak dicek</span>`:"";
+  const st=!s.nImg?`<span class="tag none">Tanpa foto</span>`:s.newN==null?`<span class="tag none">Memeriksa…</span>`:s.newN?`<span class="tag new">${num(s.newN)} foto baru</span>`:`<span class="tag done">✓ Sudah dibaca semua</span>`;
+  const d=s.nImg&&s.who&&s.ym?(inDash(s.who,s.ym)?` <span class="tag info" title="Bulan ini sudah ada di dashboard; hanya hasil foto yang ditambahkan">Sudah ada di dashboard</span>`:` <span class="tag info" title="Bulan ini belum ada di dashboard; datanya ikut ditambahkan">Bulan baru</span>`):"";
+  return `<tr class="${s.nImg?"":"off"}${s.on?" sel":""}"><td><input type="checkbox" data-on="${i}"${s.on?" checked":""}${s.nImg?"":" disabled"} aria-label="Pilih sheet ${esc(s.name)}"></td>
+   <td><div class="sn" title="${esc(s.name)}">${esc(s.name)}</div><span class="fn" title="${esc(s.F.file.name)}">${esc(s.F.file.name)} · ${num(s.recs.size)} customer</span></td>
+   <td><select data-who="${i}" aria-label="Sales"><option value="">Pilih sales</option>${PEOPLE.map(p=>`<option${p===s.who?" selected":""}>${esc(p)}</option>`).join("")}</select></td>
+   <td><input type="month" data-ym="${i}" value="${s.ym}" aria-label="Bulan"></td><td class="r">${num(s.nImg)}</td><td class="stc">${cg}${st}${d}</td></tr>`;}).join("")}</tbody></table></div>`;
+ const sel=SHEETS.filter(s=>s.on);$("#go").disabled=!sel.length||!!RUN;
+ $("#selInfo").textContent=sel.length?`${sel.length} sheet dipilih · ${num(sel.reduce((a,s)=>a+(s.newN==null?s.nImg:s.newN),0))} foto baru${sel.some(s=>!s.who||!s.ym)?" · lengkapi sales dan bulan":""}`:"Centang sheet yang mau dibaca di langkah 1";
+ hashPending();}
+let hashing=false;async function hashPending(){if(hashing)return;hashing=true;for(const s of SHEETS){if(s.nImg&&s.newN==null){await hashSheet(s);s.chg=sheetChanges(s);if(s.chg.length)s.on=true;if(s.newN>0&&s.who&&s.ym&&!SHEETS.some(o=>o!==s&&o.on&&o.who===s.who&&o.ym===s.ym))s.on=true;hashing=false;renderSheets();return;}}hashing=false;}
+function renderPacks(){const box=$("#packs");const mo=[...new Set(PACKS.flatMap(p=>p.meta.months||[]))].sort(),tot=PACKS.reduce((a,p)=>a+p.size,0);xlMonths(mo);
+ box.innerHTML=PACKS.length?`<b>${num(KN.size)}</b> foto · ${mo.length>1?`${ml(mo[0])} – ${ml(mo[mo.length-1])}`:ml(mo[0])} · ${(tot/1048576).toFixed(1).replace(".",",")} MB`:"Belum ada foto yang dibaca di browser ini.";}
+
+/* ---------- OCR ---------- */
+let SCH=null,NW=0;
+function blobOf(id,type){return new Blob([document.getElementById(id).textContent],{type});}
+async function ensureOcr(n){if(SCH&&NW>=n)return SCH;const st=$("#runSt");st.textContent="Menyiapkan pembaca teks…";$("#prog").hidden=false;$("#pgN").textContent="Bersiap…";$("#pgEta").textContent="";await tick();
+ if(!SCH)SCH=Tesseract.createScheduler();
+ if(!ensureOcr.boot){const parts=[document.getElementById("tcore").textContent,'\n;self.__TD="',document.getElementById("tdata").textContent.trim(),'";const _f=self.fetch.bind(self);self.fetch=(u,...a)=>{if(String(u).includes("eng.traineddata")){const b=atob(self.__TD),x=new Uint8Array(b.length);for(let i=0;i<b.length;i++)x[i]=b.charCodeAt(i);return Promise.resolve(new Response(x));}return _f(u,...a);};\n',document.getElementById("twork").textContent];
+  ensureOcr.boot=URL.createObjectURL(new Blob(parts,{type:"application/javascript"}));}
+ while(NW<n){const w=await Tesseract.createWorker("eng",1,{workerPath:ensureOcr.boot,workerBlobURL:false,corePath:"https://local/core/",langPath:"https://local/lang",cacheMethod:"none",gzip:true});
+  await w.setParameters({tessedit_pageseg_mode:"11"});SCH.addWorker(w);NW++;st.textContent=`Menyiapkan pembaca teks… ${NW}/${n}`;}
+ return SCH;}
+async function readImage(u8,mime){const d=await decodeImg(u8,mime);d.words=await tessWords(d,u8,mime);return d;}
+async function decodeImg(u8,mime){const bm=await createImageBitmap(new Blob([u8],{type:mime}));const W=bm.width,H=bm.height;
+ /* blank check */
+ const c64=document.createElement("canvas");c64.width=64;c64.height=64;const g=c64.getContext("2d");g.drawImage(bm,0,0,64,64);const d=g.getImageData(0,0,64,64).data;let s=0,s2=0;for(let i=0;i<d.length;i+=4){const v=.299*d[i]+.587*d[i+1]+.114*d[i+2];s+=v;s2+=v*v;}
+ const n=d.length/4,sd=Math.round(Math.sqrt(Math.max(0,s2/n-(s/n)**2))*10)/10;
+ return {bm,W,H,sd};}
+async function tessWords(d,u8,mime){const {bm,W,H}=d;let sc=1,src=new Blob([u8],{type:mime});if(W<1000)sc=2;else if(W>1800)sc=1800/W;
+ if(sc!==1){const cv=document.createElement("canvas");cv.width=Math.round(W*sc);cv.height=Math.round(H*sc);const cg=cv.getContext("2d");cg.fillStyle="#fff";cg.fillRect(0,0,cv.width,cv.height);cg.drawImage(bm,0,0,cv.width,cv.height);src=cv;}
+ const r=await SCH.addJob("recognize",src,{},{blocks:true,text:true});
+ const words=(r.data.words||[]).filter(w=>w.text&&w.text.trim()).map(w=>[w.text,Math.round(w.bbox.x0/sc),Math.round(w.bbox.y0/sc),Math.round((w.bbox.x1-w.bbox.x0)/sc),Math.round((w.bbox.y1-w.bbox.y0)/sc),Math.round(w.confidence)]);
+ return words;}
+async function makeCrop(bm,W,H,words,sid,p9){const c=FT.cropBox(W,H,words,sid,p9),[x0,y0,x1,y1]=c.box,w=Math.max(1,Math.round((x1-x0)*c.s)),h=Math.max(1,Math.round((y1-y0)*c.s));
+ const cv=document.createElement("canvas");cv.width=w;cv.height=h;const g=cv.getContext("2d");g.filter="grayscale(1)";g.imageSmoothingQuality="high";g.drawImage(bm,x0,y0,x1-x0,y1-y0,0,0,w,h);
+ let b=await new Promise(r=>cv.toBlob(r,"image/webp",.45));if(!b||b.type!=="image/webp")b=await new Promise(r=>cv.toBlob(r,"image/jpeg",.5));
+ return {u8:new Uint8Array(await b.arrayBuffer()),w,ht:h,k:c.k,box:c.box};}
+/* PaddleOCR first when the laptop has a usable graphics card (WebGPU); it then reads faster and better than Tesseract */
+/* second reader (PaddleOCR), one image at a time */
+let PDQ=Promise.resolve(),PDOFF=false;
+function pdRead(bm,W,H){const job=PDQ.then(async()=>{let src=bm,sc=1;if(W>1800){sc=1800/W;const c=document.createElement("canvas");c.width=1800;c.height=Math.round(H*sc);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);src=c;}
+ const lines=await PD.read(src,Math.round(W*sc),Math.round(H*sc));return PD.words(lines.map(l=>[l[0],l[1]/sc,l[2]/sc,l[3]/sc,l[4]/sc,l[5]]));});PDQ=job.catch(()=>{});return job;}
+
+/* ---------- run ---------- */
+async function start(){const sel=SHEETS.filter(s=>s.on);if(!sel.length)return;
+ const bad=sel.find(s=>!s.who||!/^\d{4}-\d{2}$/.test(s.ym));if(bad){alert(`Lengkapi sales dan bulan untuk sheet "${bad.name}".`);return;}
+ const dup=sel.find((s,i)=>sel.findIndex(o=>o.who===s.who&&o.ym===s.ym)!==i);if(dup){alert(`Dua sheet dipilih untuk ${dup.who} ${ml(dup.ym)}. Pilih salah satu saja.`);return;}
+ const want=+$("#nw").value||Math.max(1,Math.min(4,(navigator.hardwareConcurrency||4)-1));
+ RUN={paused:false,stop:false,done:0,total:0,t0:0,times:[],res:[]};$("#go").disabled=true;$("#pause").hidden=false;$("#pause").textContent="Jeda";$("#prog").hidden=false;$("#bar").style.width="0";
+ for(const s of sel)await hashSheet(s);
+ RUN.total=sel.reduce((a,s)=>a+s.newN,0);
+ try{await ensureOcr(want);}catch(e){$("#runSt").textContent="Pembaca teks gagal disiapkan: "+e.message;$("#pause").hidden=true;RUN=null;renderSheets();return;}
+ RUN.t0=performance.now();
+ for(const s of sel){if(RUN.stop)break;await runSheet(s,want);}
+ const ok=!RUN.stop;$("#pause").hidden=true;
+ const mins=Math.max(1,Math.round((performance.now()-RUN.t0)/60000));$("#pgN").textContent=ok?"✓ Selesai":"Dihentikan";$("#pgEta").textContent=ok?`${num(RUN.done)} foto baru dibaca dalam ±${mins} menit`:"";$("#runSt").textContent=ok?(RUN.done?(D?"Hasilnya ada di bawah dan sudah dikirim ke dashboard.":"Hasilnya ada di bawah."):"Semua foto di sheet ini sudah pernah dibaca; hasilnya langsung dikirim ke dashboard."):"";if(ok)$("#bar").style.width="100%";
+ RUN=null;renderSheets();renderPacks();}
+function eta(){if(!RUN||!RUN.done)return "";const el=(performance.now()-RUN.t0)/1000,per=el/RUN.done,left=Math.max(0,RUN.total-RUN.done)*per;return left<60?"sisa kurang dari 1 menit":`sisa ±${Math.ceil(left/60)} menit`;}
+async function waitPause(){while(RUN&&RUN.paused&&!RUN.stop)await new Promise(r=>setTimeout(r,250));}
+async function runSheet(s,nw){const pn=s.who,ym=s.ym,st=$("#runSt"),RUNAT=Date.now(),CHG=sheetChanges(s);st.textContent=`Sedang membaca: ${pn} · ${ml(ym)}`;
+ const medias=new Set(s.want.values()),z=unz(s.F,n=>medias.has(n));
+ /* context for verdicts: every SID and phone of this sales in the loaded files + dashboard */
+ const allSids=new Set(),p9map=new Map();allSids.names=new Map();SHEETS.filter(o=>o.who===pn).forEach(o=>o.recs.forEach((r,sid)=>{allSids.add(sid);if(r.name)allSids.names.set(sid,r.name);if(r.p9){let a=p9map.get(r.p9);if(!a)p9map.set(r.p9,a=new Set());a.add(sid);}}));
+ if(D){const p=D.people.find(x=>x.n===pn);if(p)p.ids.forEach((x,k)=>{allSids.add(x);if(!allSids.names.has(x)&&p.names&&p.names[k])allSids.names.set(x,p.names[k]);});}
+ const bySid=new Map();s.want.forEach((m,sid)=>bySid.set(sid,m));const firstSid=new Map();bySid.forEach((m,sid)=>{if(!firstSid.has(m))firstSid.set(m,sid);});
+ const data={t:`${s.F.file.name.replace(/\.xlsx$/i,"")} · ${s.name}`,recs:[...s.recs].map(([sid,r])=>[sid,r.name,r.vip,r.f])};
+ let chunk={rows:[],imgs:[],tx:{}},first=true,sum={n:0,c:[0,0,0,0,0],flag:[]};const flush=async(final)=>{if(!chunk.rows.length&&!first)return;
+  const c=chunk,isFirst=first;chunk={rows:[],imgs:[],tx:{}};first=false;
+  const head={sheets:[Object.assign({pn,ym,t:data.t,data:isFirst?data:null,rows:c.rows,at:RUNAT},isFirst&&CHG.length?{chg:CHG.map(x=>[x.sid,x.k,x.h||"",x.at||0,x.lost||null])}:{})],tx:c.tx};const id=`E-${ym}-${pn}-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
+  const bytes=await FT.seal(head,c.imgs,{id,made:Date.now(),months:[ym],people:[pn],rows:c.rows.length,src:"Alat Cek Foto"},PW);
+  await FT.store.put({id,meta:FT.meta(bytes),bytes:bytes.buffer,at:Date.now()});SESSION.push(id);PACKS.push({id,meta:FT.meta(bytes),size:bytes.length,at:Date.now()});
+  try{FT.ch&&FT.ch.postMessage({t:"pack",id});}catch(e){}renderPacks();void final;};
+ const hv=new Map();medias.forEach(m=>{const x=s.hashed.get(m);if(x)hv.set(m,x);});
+ const done=new Map();   /* media -> {h,sd,tx} */
+ const todo=[...medias].filter(m=>hv.has(m));
+ /* photos already known: verdict from stored facts, no reading needed */
+ const sidsOf=m=>[...bySid].filter(([,mm])=>mm===m).map(([q])=>q),miss=(tx,m)=>sidsOf(m).some(q=>{const rr=s.recs.get(q);return FT.codeOf(tx,q,rr.p9,rr.name,allSids,p9map)[0]!==1;});
+ let again=0;for(const m of todo){const x=hv.get(m);if(!KN.has(x.h))continue;const tx=KN.get(x.h);
+  /* read before this version's better matching and not matched: read once more */
+  if(!tx[3]&&miss(tx,m)){again++;continue;}done.set(m,{h:x.h,sd:null,tx,known:1});}
+ if(again&&RUN)RUN.total+=again;
+ const queue=todo.filter(m=>!done.has(m));let inflight=0,qi=0,err=0;
+ await new Promise(resolve=>{const next=()=>{if(RUN.stop){if(!inflight)resolve();return;}
+   while(inflight<nw*2&&qi<queue.length&&!RUN.paused){const m=queue[qi++],x=hv.get(m),sid=firstSid.get(m),r=s.recs.get(sid);inflight++;
+    (async()=>{let out=null;try{const o=await decodeImg(z[m],x.mime);let words=null,tx=null;
+      if(!words){words=await tessWords(o,z[m],x.mime);tx=FT.txOf(words);
+      /* Tesseract first; if a customer of this photo is not matched, read again with PaddleOCR and combine */
+      if(!PDOFF&&miss(tx,m)){
+       try{if(!PD.ok)st.textContent="Menyiapkan pembaca kedua (PaddleOCR)…";const w2=await pdRead(o.bm,o.W,o.H);words=words.concat(w2);tx=FT.txOf(words);RUN.pd=(RUN.pd||0)+1;}catch(e){PDOFF=true;RUN.pdErr=String(e&&e.message||e);}}}
+      const cr=await makeCrop(o.bm,o.W,o.H,words,sid,r&&r.p9);o.bm.close&&o.bm.close();
+      out={h:x.h,sd:o.sd,tx,cu8:cr.u8,words,box:cr.box};chunk.imgs.push({h:x.h,u8:cr.u8,w:cr.w,ht:cr.ht,k:cr.k});chunk.tx[x.h]=tx;KN.set(x.h,tx);}catch(e){err++;}
+     if(out)done.set(m,out);RUN.done++;inflight--;
+     /* rows of this photo */
+     if(out)bySid.forEach((mm,sd_)=>{if(mm!==m)return;const rr=s.recs.get(sd_),[code,oth,ev,tok]=FT.codeOf(out.tx,sd_,rr.p9,rr.name,allSids,p9map),hl=code===1||code===4?FT.hlBox(out.words,tok,ev,out.box):null;chunk.rows.push([sd_,out.h,out.sd,code,oth,ev,hl]);sum.n++;sum.c[code]++;if(code===4){if(!CROPU.has(out.h))CROPU.set(out.h,URL.createObjectURL(new Blob([out.cu8],{type:"image/webp"})));sum.flag.push([sd_,rr.name,code,out.h,oth]);}});
+     const pc=RUN.total?RUN.done/RUN.total*100:100;$("#bar").style.width=pc.toFixed(1)+"%";$("#pgN").textContent=`${num(RUN.done)} / ${num(RUN.total)} foto`;$("#pgEta").textContent=RUN.paused?"dijeda":eta();st.textContent=`Sedang membaca: ${pn} · ${ml(ym)}${RUN.pd?` · ${num(RUN.pd)} foto dibaca ulang dengan pembaca kedua`:""}${err?` · ${err} foto gagal dibaca`:""}${PDOFF?" · pembaca kedua tidak bisa dipakai di browser ini":""}`;
+     if(chunk.imgs.length>=120)await flush(false);
+     if(qi>=queue.length&&!inflight)resolve();else next();})();}
+   if(RUN.paused&&!inflight){waitPause().then(next);}
+   if(qi>=queue.length&&!inflight)resolve();};next();});
+ /* rows whose photo was already known */
+ bySid.forEach((m,sid)=>{const o=done.get(m);if(!o||!o.known)return;const rr=s.recs.get(sid),[code,oth,ev]=FT.codeOf(o.tx,sid,rr.p9,rr.name,allSids,p9map);chunk.rows.push([sid,o.h,null,code,oth,ev,null]);sum.n++;sum.c[code]++;if(code===4)sum.flag.push([sid,rr.name,code,o.h,oth]);});
+ await flush(true);s.newN=0;
+ {const key=pn+"|"+ym;let e=PREV.get(key);if(!e)PREV.set(key,e={ph:new Map(),fl:new Map(),nm:new Map(),at:0,flAt:0});s.want.forEach((m,sid)=>{const x=s.hashed.get(m);if(x)e.ph.set(sid,[x.h,RUNAT]);});s.recs.forEach((r,sid)=>{e.fl.set(sid,[r.f,RUNAT]);if(r.name)e.nm.set(sid,r.name);});e.at=e.flAt=RUNAT;s.chg=[];s.chgDone=CHG;}
+ const pe=PREV.get(pn+"|"+ym),dpp=D&&D.people.find(x=>x.n===pn);sum.chg=CHG.map(c=>Object.assign({name:(s.recs.get(c.sid)||{}).name||(pe&&pe.nm.get(c.sid))||(dpp&&dpp.names[dpp.ids.indexOf(c.sid)])||""},c));RUN.res.push({pn,ym,sum});renderResults();}
+async function cropUrl(h){if(CROPU.has(h))return CROPU.get(h);const id=HIDX.get(h);if(!id)return null;try{const r=await FT.store.get(id);const o=await FT.open(new Uint8Array(r.bytes),PW);
+  Object.entries(o.head.img||{}).forEach(([hh,[off,len]])=>{if(!CROPU.has(hh)&&(hh===h||LASTRES.some(x=>(x.sum.chg||[]).some(c=>c.h===hh))))CROPU.set(hh,URL.createObjectURL(new Blob([o.body.slice(o.base+off,o.base+off+len)],{type:"image/webp"})));});}catch(e){}return CROPU.get(h)||null;}
+function renderChanges(){const box=$("#chgBox");if(!box)return;const ch=LASTRES.flatMap(x=>(x.sum.chg||[]).map(c=>[x.pn,x.ym,c]));if(!ch.length){box.innerHTML="";return;}
+ box.innerHTML=`<div class="ch" style="margin:16px 0 0"><h2 style="font-size:14px" class="bad">⚠ Berubah sejak dicek sebelumnya: ${num(ch.length)}</h2><span class="sub">foto di bawah adalah bukti yang tersimpan saat dicek</span></div>
+  <div class="tw"><table><thead><tr><th>Sales</th><th>Bulan</th><th>SID</th><th>Nama</th><th>Perubahan</th><th>Foto lama</th></tr></thead><tbody>${ch.slice(0,200).map(([pn,ym,c])=>`<tr><td><b>${esc(pn)}</b></td><td>${ml(ym)}</td><td>${esc(c.sid)}</td><td>${esc(c.name)}</td><td class="bad">${esc(chgTxt(c))}</td><td>${c.h?`<img data-h="${c.h}" data-zoom="1" alt="" style="height:44px;max-width:120px;object-fit:contain;background:#fff;border-radius:6px;cursor:zoom-in">`:"–"}</td></tr>`).join("")}</tbody></table></div>`;
+ box.querySelectorAll("img[data-h]").forEach(async im=>{const u=await cropUrl(im.dataset.h);if(u)im.src=u;else im.replaceWith(document.createTextNode("–"));});}
+function renderResults(){if(!RUN)return;LASTRES=RUN.res;renderChanges();const box=$("#results"),fl=RUN.res.flatMap(x=>x.sum.flag.map(f=>[x.pn,x.ym].concat(f))).filter(f=>CROPU.has(f[5]));
+ box.innerHTML=`<div class="tw" style="margin-top:0"><table><thead><tr><th>Sales</th><th>Bulan</th><th class="r">Customer berfoto</th><th class="r">Terverifikasi</th><th class="r" title="Ada teks, tapi SID/nomor/nama customer ini tidak terbaca">Belum cocok</th><th class="r" title="Hampir tidak ada teks di foto">Tidak terbaca</th><th class="r" title="Terbaca SID atau nomor customer lain">Data customer lain</th></tr></thead><tbody>${RUN.res.map(x=>{const c=x.sum.c,ocr=c[1]+c[2]+c[3]+c[4];
+  return `<tr><td><b>${esc(x.pn)}</b></td><td>${ml(x.ym)}</td><td class="r">${num(x.sum.n)}</td><td class="r"><b>${ocr?Math.round(c[1]/ocr*100):0}%</b> <span class="muted">(${num(c[1])})</span></td><td class="r">${num(c[2])}</td><td class="r">${num(c[3])}</td><td class="r ${c[4]?"bad":""}">${num(c[4])}</td></tr>`;}).join("")}</tbody></table></div>
+  ${fl.length?`<div class="ch" style="margin:16px 0 0"><h2 style="font-size:14px">Foto berisi data customer lain</h2><span class="sub">perlu dicek · klik foto untuk memperbesar</span></div><div class="gal">${fl.slice(0,24).map(f=>`<figure><img src="${CROPU.get(f[5])}" alt="" data-zoom="1"><figcaption><b>${esc(f[0])}</b> · ${ml(f[1])}<br>${esc(f[2])} ${esc(f[3]||"")}<br><span class="bad">terbaca ${esc(f[6])}</span></figcaption></figure>`).join("")}</div>${fl.length>24?`<div class="muted" style="margin-top:6px">dan ${fl.length-24} lainnya; semuanya ada di tab Kontak dashboard.</div>`:""}`:""}
+  ${D?`<div class="muted" style="margin-top:10px">Rincian per customer ada di tab Kontak dashboard Team E.</div>`:""}`;
+ $("#resCard").hidden=false;$("#sync").hidden=!D;}
+
+/* ---------- export / import ---------- */
+async function mergePacks(ids){const heads=[],imgs=[],seen=new Set();let months=new Set(),people=new Set(),rows=0;
+ for(const id of ids){const r=await FT.store.get(id);if(!r)continue;const o=await FT.open(new Uint8Array(r.bytes),PW);heads.push(o.head);(o.meta.months||[]).forEach(m=>months.add(m));(o.meta.people||[]).forEach(m=>people.add(m));
+  Object.entries(o.head.img||{}).forEach(([h,[off,len,w,ht,k]])=>{if(seen.has(h))return;seen.add(h);imgs.push({h,u8:o.body.slice(o.base+off,o.base+off+len),w,ht,k});});rows+=o.head.sheets.reduce((a,s)=>a+s.rows.length,0);}
+ const head={sheets:heads.flatMap(h=>h.sheets),tx:Object.assign({},...heads.map(h=>h.tx||{}))};months=[...months].sort();
+ const id=`E-${months[0]||"x"}-gabungan-${Date.now()}`;return {bytes:await FT.seal(head,imgs,{id,made:Date.now(),months,people:[...people],rows,src:"Gabungan alat Cek Foto"},PW),months};}
+function save(bytes,name){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([bytes],{type:"application/octet-stream"}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},120000);}
+async function exportIds(ids,label){const st=$("#expSt");if(!ids.length){st.textContent="Belum ada hasil untuk disimpan.";return;}st.textContent="Menyiapkan file…";await tick();
+ try{const {bytes,months}=await mergePacks(ids);const d=new Date(),ds=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  save(bytes,`Foto_Team_E_${months.length>1?months[0]+"_sd_"+months[months.length-1]:months[0]||label}_${ds}.tefoto`);st.textContent=`File disimpan (${(bytes.length/1048576).toFixed(1).replace(".",",")} MB). Di laptop lain, buka dashboard Team E › tab Kontak › Foto bukti › Masukkan file hasil foto.`;}
+ catch(e){st.textContent="Gagal membuat file: "+e.message;}}
+async function importFiles(list){const st=$("#impSt");let ok=0,bad=0,same=0;for(const f of list){const u8=new Uint8Array(await f.arrayBuffer()),m=FT.meta(u8);if(!m){bad++;continue;}
+  try{await FT.open(u8,PW);}catch(e){st.textContent=`${f.name} dikunci dengan password Data TL yang lain.`;bad++;continue;}
+  if(PACKS.some(p=>p.id===m.id)){same++;continue;}await FT.store.put({id:m.id,meta:m,bytes:u8.buffer,at:Date.now()});try{FT.ch&&FT.ch.postMessage({t:"pack",id:m.id});}catch(e){}ok++;}
+ await loadKnown(await FT.store.all());renderPacks();SHEETS.forEach(s=>{s.hashed&&(s.newN=[...s.hashed.values()].filter(x=>!KN.has(x.h)).length);});renderSheets();
+ st.textContent=`${ok} file dimasukkan${same?`, ${same} sudah ada sebelumnya`:""}${bad?`, ${bad} tidak bisa dibuka`:""}.`;}
+
+/* ---------- Excel archive: SID, phone, proof photo, what needs checking (password-protected) ---------- */
+const CODEL=["Tidak terbaca","Terverifikasi","Belum cocok","Tidak terbaca","Data customer lain"],EVL={s:"SID",p:"nomor HP",n:"nama"};
+const decF=f=>f<0?null:{ct:f%3,cr:Math.floor(f/3)%3,wa:Math.floor(f/9)%3,pc:Math.floor(f/27)%3};
+async function toJpeg(blob,maxSide,gray){let bm;try{bm=await createImageBitmap(blob);}catch(e){return null;}const sc=Math.min(1,maxSide/Math.max(bm.width,bm.height)),w=Math.max(1,Math.round(bm.width*sc)),h=Math.max(1,Math.round(bm.height*sc));
+ const c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);if(gray)g.filter="grayscale(1)";g.imageSmoothingQuality="high";g.drawImage(bm,0,0,w,h);bm.close&&bm.close();
+ const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.72));c.width=0;c.height=0;return b?{u8:new Uint8Array(await b.arrayBuffer()),w,h}:null;}
+function xlMonths(mo){const sel=$("#xlMonth");if(!sel)return;const cur=sel.value;sel.innerHTML=mo.slice().reverse().map(m=>`<option value="${m}">${ml(m)}</option>`).join("");if(mo.includes(cur))sel.value=cur;xlSrc();}
+function xlSrc(){const f=!!xlSheets().length,sel=$("#xlMonth");if(!sel)return;sel.closest("label").hidden=f||!sel.options.length;const i=$("#xlInfo");if(i)i.textContent=f?`Dari ${xlSheets().length} sheet di langkah 1 · lengkap dengan nomor HP`:PACKS.length?"Dari cadangan foto · tanpa nomor HP":"Pilih file di langkah 1 atau muat cadangan .tefoto";}
+function xlSheets(){const ok=s=>s.who&&/^\d{4}-\d{2}$/.test(s.ym);const on=SHEETS.filter(s=>s.on&&ok(s));return on.length?on:SHEETS.filter(ok);}
+async function makeExcel(){const st=$("#xlSt"),own=$("#xlOwn").checked,mode=$("#xlMode").value;let pw=PW;
+ if(own){const p1=$("#xlPw").value,p2=$("#xlPw2").value;if(p1.length<6){st.textContent="Password Excel minimal 6 karakter.";$("#xlPw").focus();return;}if(p1.length>255){st.textContent="Password terlalu panjang.";return;}if(p1!==p2){st.textContent="Kedua password tidak sama.";$("#xlPw2").focus();return;}pw=p1;}
+ const btn=$("#xlGo");btn.disabled=true;const S=XLW.S,list=xlSheets();
+ const media=new Map(),dim=new Map(),groups=[];   /* groups: {pn,ym,src,rows:[{sid,name,ph,h,code,oth,ct}]} */
+ const nameOf=(pn,sid)=>{if(!D)return "";const p=D.people.find(x=>x.n===pn);if(!p)return "";const i=p.ids.indexOf(sid);return i>=0?p.names[i]||"":"";};
+ const addImg=async(h,blob,max)=>{if(media.has(h))return;const j=await toJpeg(blob,max,false);if(j){media.set(h,{u8:j.u8,ext:"jpeg"});dim.set(h,[j.w,j.h]);}};
+ try{
+  if(list.length){
+   /* from Customer Background files: every customer with SID, name and phone; photo from the file itself */
+   st.textContent="Menyiapkan daftar…";await tick();for(const s of list)await hashSheet(s);
+   const need=new Map(),CM=new Map();list.forEach(s=>{s.hashed.forEach((x,m)=>{if(!need.has(x.h))need.set(x.h,{s,m,mime:x.mime});});const cs=s.chgDone||sheetChanges(s);CM.set(s,new Map(cs.map(c=>[c.sid,c])));cs.forEach(c=>{if(c.h&&!need.has(c.h))need.set(c.h,null);});});
+   const crops=new Map();if(mode==="crop"){let k=0;for(const pk of PACKS){k++;st.textContent=`Mengambil potongan foto… ${k}/${PACKS.length}`;await tick();
+     try{const r=await FT.store.get(pk.id);if(!r)continue;const o=await FT.open(new Uint8Array(r.bytes),PW);Object.entries(o.head.img||{}).forEach(([h,[off,len]])=>{if(need.has(h)&&!crops.has(h))crops.set(h,o.body.slice(o.base+off,o.base+off+len));});}catch(e){}}}
+   let n=0,zc=new Map();for(const [h,src] of need){n++;if(n%10===0){st.textContent=`Menyiapkan foto ${num(n)}/${num(need.size)}…`;await tick();}
+    if(crops.has(h))await addImg(h,new Blob([crops.get(h)],{type:"image/webp"}),520);
+    if(!media.has(h)&&src){let z=zc.get(src.s);if(!z){zc.clear();z=unz(src.s.F,nm=>src.s.hashed.has(nm));zc.set(src.s,z);}if(z[src.m])await addImg(h,new Blob([z[src.m]],{type:src.mime}),mode==="crop"?640:900);}}
+   zc.clear();crops.clear();
+   for(const s of list){const pn=s.who,allSids=new Set(),p9map=new Map();allSids.names=new Map();SHEETS.filter(o=>o.who===pn).forEach(o=>o.recs.forEach((r,sid)=>{allSids.add(sid);if(r.name)allSids.names.set(sid,r.name);if(r.p9){let a=p9map.get(r.p9);if(!a)p9map.set(r.p9,a=new Set());a.add(sid);}}));
+    const dp=D&&D.people.find(x=>x.n===pn);if(dp)dp.ids.forEach(x=>allSids.add(x));const rows=[];
+    s.recs.forEach((r,sid)=>{const fl=decF(r.f),ct=!!(fl&&(fl.ct===1||fl.pc===1||fl.wa===1||fl.cr===1)),m=s.want.get(sid),x=m&&s.hashed.get(m),h=x&&x.h,tx=h?KN.get(h):null;let code=null,oth="";if(h&&tx)[code,oth]=FT.codeOf(tx,sid,r.p9,r.name,allSids,p9map);
+     const cg=CM.get(s).get(sid);rows.push({sid,name:r.name,ph:r.ph||"",h:cg&&cg.k==="del"?cg.h:h,code:h?(tx?code:-1):null,oth,ct,cg});});
+    CM.get(s).forEach(cg=>{if(cg.k!=="gone")return;const pe=PREV.get(pn+"|"+s.ym);rows.push({sid:cg.sid,name:(pe&&pe.nm.get(cg.sid))||nameOf(pn,cg.sid),ph:"",h:cg.h,code:null,oth:"",ct:false,cg});});
+    groups.push({pn,ym:s.ym,src:`${s.F.file.name} › ${s.name}`,rows});}}
+  else if(PACKS.length){
+   /* only the saved readings (.tefoto): SID, name, photo and result; phone numbers are never stored in those files */
+   const ym=$("#xlMonth").value,by=new Map(),needH=new Set(),open=async(pk)=>{try{const r=await FT.store.get(pk.id);return r?await FT.open(new Uint8Array(r.bytes),PW):null;}catch(e){return null;}};
+   let k=0;for(const pk of PACKS){k++;if(ym&&!(pk.meta.months||[]).includes(ym))continue;st.textContent=`Membuka cadangan foto ${k}/${PACKS.length}…`;await tick();const o=await open(pk);if(!o)continue;
+    const names=new Map();(o.head.sheets||[]).forEach(sh=>{if(sh.data&&sh.data.recs)sh.data.recs.forEach(x=>names.set(sh.pn+"|"+x[0],x[1]));});
+    for(const sh of (o.head.sheets||[])){if(ym&&sh.ym!==ym)continue;const key=sh.pn+"|"+sh.ym;let g=by.get(key);if(!g){g={pn:sh.pn,ym:sh.ym,src:"cadangan foto (.tefoto)",m:new Map()};by.set(key,g);}
+     for(const r of sh.rows){const [sid,h,,code,oth]=r;needH.add(h);g.m.set(sid,{sid,name:names.get(sh.pn+"|"+sid)||nameOf(sh.pn,sid),ph:"",h,code,oth,ct:true});}}}
+   /* photos live in the pack of the month they were first used, so look through every pack */
+   k=0;for(const pk of PACKS){k++;st.textContent=`Mengambil foto ${k}/${PACKS.length} · ${num(media.size)}/${num(needH.size)}…`;await tick();const o=await open(pk);if(!o)continue;const img=o.head.img||{};let n=0;
+    for(const h in img){if(!needH.has(h)||media.has(h))continue;const [off,len]=img[h];await addImg(h,new Blob([o.body.slice(o.base+off,o.base+off+len)],{type:"image/webp"}),520);if(++n%25===0){st.textContent=`Mengambil foto ${k}/${PACKS.length} · ${num(media.size)}/${num(needH.size)}…`;await tick();}}}
+   by.forEach(g=>groups.push({pn:g.pn,ym:g.ym,src:g.src,rows:[...g.m.values()]}));}
+  else{st.textContent="Pilih file Customer Background di langkah 1, atau muat cadangan .tefoto dulu.";return;}
+  /* sheets: one per sales-month */
+  const H=["No","SID","Nama","No HP","Foto","Status"],W=[5,13,24,16,31,34],BOXW=196,BOXH=150,ROWH=118;const sheets=[],sum=[];
+  groups.sort((a,b)=>a.pn<b.pn?-1:a.pn>b.pn?1:a.ym<b.ym?-1:a.ym>b.ym?1:0);
+  for(const g of groups){const hasN=g.rows.some(r=>r.name),hasP=g.rows.some(r=>r.ph),keep=[true,true,hasN,hasP,true,true],pick=a=>a.filter((_,i)=>keep[i]),fc=pick([0,1,2,3,4,5]).indexOf(4),last=keep.filter(Boolean).length-1;
+   const rows=g.rows.map(r=>{let tx,s,k;
+    if(r.cg){tx="Perlu dicek: "+chgTxt(r.cg)+(r.cg.k==="del"||r.cg.k==="gone"?" (foto = bukti lama)":"");s=S.bad;k=0;}
+    else if(r.h==null){if(r.ct){tx="Perlu dicek: contacted tanpa foto";s=S.bad;k=0;}else{tx="–";s=S.mute;k=3;}}
+    else if(r.code===-1){tx="Foto belum dibaca";s=S.warn;k=1;}
+    else if(r.code===1){tx="✓ Cocok";s=S.good;k=2;}
+    else if(r.code===4){tx=`Perlu dicek: foto berisi customer lain (${r.oth})`;s=S.bad;k=0;}
+    else if(r.code===2&&r.oth){tx=`Perlu dicek: nomor di foto terdaftar di customer lain (${r.oth}); nomor HP customer ini kosong, mungkin nomor kedua`;s=S.bad;k=0;}
+    else if(r.code===2){tx="Perlu dicek: SID/nomor/nama tidak terbaca";s=S.bad;k=0;}
+    else{tx="Perlu dicek: foto buram/tanpa teks";s=S.bad;k=0;}
+    if(r.h!=null&&!dim.has(r.h)&&k!==0)tx+=" (foto tidak bisa ditampilkan)";return {k,h:r.h,c:pick([0,{v:r.sid,s:S.text},{v:r.name,s:S.wrap},{v:r.ph,s:S.text},{v:"",s:S.wrap},{v:tx,s}])};});
+   rows.sort((a,b)=>a.k-b.k);const cnt={n:rows.length,foto:rows.filter(r=>r.h!=null).length,ok:rows.filter(r=>r.k===2).length,chk:rows.filter(r=>r.k===0).length,unread:rows.filter(r=>r.k===1).length};
+   const pics=[];rows.forEach((r,i)=>{r.c[0]={v:i+1,s:S.num};if(r.h!=null&&dim.has(r.h)){const [w,hh]=dim.get(r.h),sc=Math.min(BOXW/w,BOXH/hh);pics.push({r:i+2,c:fc,key:r.h,w:Math.round(w*sc),h:Math.round(hh*sc),alt:r.c[1].v});}});
+   const cl=XLW.colL;sheets.push({name:`${g.pn} ${ml(g.ym)}`,cols:pick(W),rows:[{h:24,c:[{v:`${g.pn} · ${ml(g.ym)}`,s:S.title},{v:"",s:S.def},{v:`Sumber: ${g.src}`,s:S.note}]},{h:24,c:pick(H).map(v=>({v,s:S.head}))}].concat(rows.map(r=>({h:r.h!=null&&dim.has(r.h)?ROWH:20,c:r.c}))),
+    freeze:2,filter:{r0:1,c0:0,r1:1+rows.length,c1:last},merges:[`C1:${cl(last)}1`],pics});sum.push([g.pn,g.ym,cnt]);}
+  const sr=[{h:24,c:[{v:"Arsip foto bukti",s:S.title}]},{h:18,c:[{v:"Rahasia: berisi data customer. Simpan di folder pribadi.",s:S.note}]},{h:24,c:["Sales","Bulan","Customer","Ada foto","Cocok","Perlu dicek","Belum dibaca"].map(v=>({v,s:S.head}))}]
+   .concat(sum.map(([pn,ym,c])=>({h:16,c:[{v:pn,s:S.wrap},{v:ml(ym),s:S.wrap},{v:c.n,s:S.num},{v:c.foto,s:S.num},{v:c.ok,s:S.num},{v:c.chk,s:c.chk?S.bad:S.num},{v:c.unread,s:c.unread?S.warn:S.num}]})));
+  st.textContent="Menyusun Excel…";await tick();
+  const zip=XLW.build([{name:"Ringkasan",cols:[16,10,11,10,10,11,12],rows:sr,merges:["A1:G1","A2:G2"]}].concat(sheets),media);media.clear();
+  const enc=NOPW?zip:await XLE.encrypt(zip,pw,(k,f)=>{st.textContent=`Mengunci file… ${k==="key"?Math.round(f*30):k==="pkg"?30+Math.round(f*70):100}%`;});
+  const ms=[...new Set(groups.map(g=>g.ym))].sort(),ps=[...new Set(groups.map(g=>g.pn))],d=new Date(),ds=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  const name=`Arsip_Foto_${ps.length===1?ps[0]:"Team_E"}_${ms.length>1?ms[0]+"_sd_"+ms[ms.length-1]:ms[0]}_${ds}.xlsx`;
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([enc],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},60000);
+  const tc=sum.reduce((a,[, ,c])=>a+c.chk,0),nc=sum.reduce((a,[, ,c])=>a+c.n,0);
+  st.textContent=`✓ ${name} · ${(enc.length/1048576).toFixed(1).replace(".",",")} MB · ${num(nc)} customer · ${num(tc)} perlu dicek${list.length?"":" · tanpa nomor HP (muat file Customer Background untuk mengisinya)"} · ${NOPW?"tanpa password":"password: "+(own?"yang Anda isi":"password Data TL")}`;
+  $("#xlPw").value="";$("#xlPw2").value="";}
+ catch(e){st.textContent="Gagal membuat Excel: "+(e&&e.message||e);}
+ finally{btn.disabled=false;}}
+
+/* ---------- events ---------- */
+document.addEventListener("DOMContentLoaded",()=>{
+ $("#lockForm").addEventListener("submit",unlock);
+ if(NOPW){$("#lock").hidden=true;const xo=$("#xlOwn");if(xo){xo.checked=false;xo.closest("label").hidden=true;}openNoPw();}
+ const dz=$("#drop");["dragenter","dragover"].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add("over");}));["dragleave","drop"].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.remove("over");}));
+ dz.addEventListener("drop",e=>{if(e.dataTransfer&&e.dataTransfer.files.length)addFiles([...e.dataTransfer.files]);});
+ $("#fileIn").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value="";});
+ $("#sheets").addEventListener("change",e=>{const t=e.target;if(t.dataset.on!=null){SHEETS[+t.dataset.on].on=t.checked;}else if(t.dataset.who!=null){SHEETS[+t.dataset.who].who=t.value;SHEETS[+t.dataset.who].chgDone=null;}else if(t.dataset.ym!=null){SHEETS[+t.dataset.ym].ym=t.value;SHEETS[+t.dataset.ym].chgDone=null;}renderSheets();});
+ $("#go").addEventListener("click",start);
+ $("#pause").addEventListener("click",()=>{if(!RUN)return;RUN.paused=!RUN.paused;$("#pause").textContent=RUN.paused?"Lanjutkan":"Jeda";$("#pgEta").textContent=RUN.paused?"dijeda":eta();});
+ document.addEventListener("click",e=>{const z=e.target.closest&&e.target.closest("img[data-zoom]");if(z){const lb=document.createElement("div");lb.className="lb";lb.innerHTML=`<img src="${z.src}" alt="">`;const im=lb.firstChild;if(z.naturalWidth&&z.naturalWidth<700)im.style.width=Math.min(z.naturalWidth*1.8,window.innerWidth*.96)+"px";lb.onclick=()=>lb.remove();document.body.appendChild(lb);}});
+ $("#expNew").addEventListener("click",()=>exportIds(SESSION.slice(),"baru"));
+ $("#expAll").addEventListener("click",()=>exportIds(PACKS.map(p=>p.id),"semua"));
+ $("#xlGo").addEventListener("click",makeExcel);$("#xlOwn").addEventListener("change",e=>{$("#xlPwRow").hidden=!e.target.checked;});
+ $("#impIn").addEventListener("change",e=>{importFiles([...e.target.files]);e.target.value="";});
+ window.addEventListener("beforeunload",e=>{if(RUN){e.preventDefault();e.returnValue="";}});
+ const hc=navigator.hardwareConcurrency||4,au=Math.max(1,Math.min(4,hc-1));$("#nw").title="Jumlah foto yang dibaca bersamaan. Makin banyak makin cepat, tapi laptop makin berat dipakai untuk pekerjaan lain.";
+ $("#nw").innerHTML=`<option value="">Otomatis · ${au} foto sekaligus</option>`+[[1,"Ringan · 1 foto sekaligus"],[2,"2 foto sekaligus"],[4,"4 foto sekaligus"],[6,"Cepat · 6 foto sekaligus"]].filter(([n])=>n<=Math.max(1,hc)&&n!==au).map(([n,l])=>`<option value="${n}">${l}</option>`).join("");
+ if(!FT.ok())$("#lockErr").textContent="Browser ini tidak mendukung enkripsi. Buka file ini di Google Chrome di laptop.";
+ setTimeout(()=>$("#pw").focus(),50);});
+window.__tool={render:()=>renderSheets(),get SHEETS(){return SHEETS;},get KN(){return KN;},get PACKS(){return PACKS;},get RUN(){return RUN;},SESSION,hashSheet,readImage,pdRead,ensureOcr,unz,get PD(){return PD;}};
+})();
+</script>
+</body>
+</html>

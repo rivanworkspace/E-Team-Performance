@@ -31,7 +31,7 @@
   S.msg("Data belum di-publish oleh TL.","Minta TL klik Publish di dashboard, lalu refresh halaman ini.",true);
   var box=document.getElementById("teBox"),w=document.createElement("div");
   w.style.cssText="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:13px";
-  w.innerHTML='<div style="margin-bottom:8px"><b>Untuk TL:</b> pilih file dashboard Team "+TEAM+" terakhir (.html) sebagai data awal, lalu Publish dari dashboard.</div><input type="file" id="teSeedIn" accept=".html,text/html"><div id="teSeedMsg" style="margin-top:8px;color:var(--mute)"></div>';
+  w.innerHTML='<div style="margin-bottom:8px"><b>Untuk TL:</b> pilih file dashboard Team '+TEAM+' terakhir (.html) sebagai data awal, lalu Publish dari dashboard.</div><input type="file" id="teSeedIn" accept=".html,text/html"><div id="teSeedMsg" style="margin-top:8px;color:var(--mute)"></div>';
   box.appendChild(w);
   document.getElementById("teSeedIn").onchange=async function(ev){var f=ev.target.files[0],m=document.getElementById("teSeedMsg");if(!f)return;m.textContent="Membaca file…";
    try{var t=await f.text(),doc=new DOMParser().parseFromString(t,"text/html"),s=doc.getElementById("seed"),c=doc.getElementById("cbseed");

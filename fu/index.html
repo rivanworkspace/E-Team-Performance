@@ -15,7 +15,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui
 <body><div class="w"><div class="b" id="box"><div class="sp" id="sp"></div><div id="msg">Memuat versi terbaru…</div><div class="m" id="sub"></div></div></div>
 <script>
 (async function(){
- var S={owner:"rivanworkspace",repo:"E-Team-Performance",branch:"main",dir:"fu",dataRepo:"rivanworkspace/E-Team-Tasks-Reminder",fuTeam:{"leader":"","members":[]},sha:null,offline:false};
+ var S={owner:"rivanworkspace",repo:"Performance-Dashboard",branch:"main",dir:"fu",dataRepo:"rivanworkspace/E-Team-Tasks-Reminder",fuTeam:{"leader":"","members":[]},sha:null,offline:false};
  /* team names: built into the private file, or passed in a shared link (#t=Leader:Member1,Member2), then kept in this browser */
  try{var hm=/[#&]t=([^&]*)/.exec(location.hash);if(hm){var v=decodeURIComponent(hm[1]).split(":");S.fuTeam={leader:(v[0]||"").trim(),members:(v[1]||"").split(",").map(function(x){return x.trim();}).filter(Boolean)};localStorage.setItem("fuTeam",JSON.stringify(S.fuTeam));history.replaceState(null,"",location.pathname+location.search);}
   else if(!S.fuTeam.members.length)S.fuTeam=JSON.parse(localStorage.getItem("fuTeam")||"null")||S.fuTeam;}catch(e){}
@@ -23,7 +23,9 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui
  var dbp=null;function db(){if(!dbp)dbp=new Promise(function(res){try{var q=indexedDB.open("fu_remote",1);q.onupgradeneeded=function(){q.result.createObjectStore("kv");};q.onsuccess=function(){res(q.result);};q.onerror=function(){res(null);};}catch(e){res(null);}});return dbp;}
  S.idb={get:function(k){return db().then(function(d){if(!d)return null;return new Promise(function(res){try{var q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=function(){res(q.result==null?null:q.result);};q.onerror=function(){res(null);};}catch(e){res(null);}});});},
   put:function(k,v){return db().then(function(d){if(!d)return;return new Promise(function(res){try{var t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=function(){res();};t.onerror=function(){res();};}catch(e){res();}});});}};
- try{var r=await fetch("https://api.github.com/repos/"+S.owner+"/"+S.repo+"/commits/"+S.branch,{headers:{Accept:"application/vnd.github.sha"},cache:"no-store"});if(r.ok){var t=(await r.text()).trim();if(/^[0-9a-f]{40}$/.test(t))S.sha=t;}}catch(e){}
+ /* repo renamed to Performance-Dashboard: use the new name once it exists, the old one until then (remembered) */
+ var REPOS=[S.repo,"E-Team-Performance"]; for(var ri=0;ri<REPOS.length&&!S.sha;ri++){try{var r=await fetch("https://api.github.com/repos/"+S.owner+"/"+REPOS[ri]+"/commits/"+S.branch,{headers:{Accept:"application/vnd.github.sha"},cache:"no-store"});if(r.ok){var t=(await r.text()).trim();if(/^[0-9a-f]{40}$/.test(t)){S.sha=t;S.repo=REPOS[ri];try{localStorage.setItem("teRepo",S.repo);}catch(e){}}}}catch(e){}}
+ if(!S.sha){try{var rk2=localStorage.getItem("teRepo");if(rk2)S.repo=rk2;else S.repo="E-Team-Performance";}catch(e){S.repo="E-Team-Performance";}}
  S.raw=function(p){return "https://raw.githubusercontent.com/"+S.owner+"/"+S.repo+"/"+(S.sha||S.branch)+"/"+S.dir+"/"+p+(S.sha?"":"?t="+Date.now());};
  var boot=null;try{var b=await fetch(S.raw("boot.js"),{cache:"no-store"});if(b.ok){boot=await b.text();S.idb.put("boot",boot);}}catch(e){}
  if(!boot){boot=await S.idb.get("boot");S.offline=true;}

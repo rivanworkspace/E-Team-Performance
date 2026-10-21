@@ -17,7 +17,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui
 <script>
 /* Team C loader: download this file once. Every time it opens it takes the newest dashboard and data from GitHub; offline it opens the last copy saved in this browser. */
 (async function(){
- var S={owner:"rivanworkspace",repo:"E-Team-Performance",branch:"main",dir:"ocr-c",team:"C",ns:"ocr-c:",people:[],sha:null,offline:false};
+ var S={owner:"rivanworkspace",repo:"Performance-Dashboard",branch:"main",dir:"ocr-c",team:"C",ns:"ocr-c:",people:[],sha:null,offline:false};
  var $=function(i){return document.getElementById(i);};
  /* names for tools that need them: built into a private file, or passed in a shared link (#p=…), then kept in this browser */
  try{var hm=/[#&]p=([^&]*)/.exec(location.hash);if(hm){S.people=decodeURIComponent(hm[1]).split(",").map(function(x){return x.trim();}).filter(Boolean);localStorage.setItem(S.ns+"people",JSON.stringify(S.people));history.replaceState(null,"",location.pathname+location.search);}
@@ -27,8 +27,9 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui
  S.idb={get:async function(k){var d=await db();if(!d)return null;return new Promise(function(res){try{var q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=function(){res(q.result==null?null:q.result);};q.onerror=function(){res(null);};}catch(e){res(null);}});},
   put:async function(k,v){var d=await db();if(!d)return;return new Promise(function(res){try{var t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=function(){res();};t.onerror=function(){res();};}catch(e){res();}});},
   del:async function(k){var d=await db();if(!d)return;return new Promise(function(res){try{var t=d.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=function(){res();};t.onerror=function(){res();};}catch(e){res();}});}};
- try{var r=await fetch("https://api.github.com/repos/"+S.owner+"/"+S.repo+"/commits/"+S.branch,{headers:{Accept:"application/vnd.github.sha"},cache:"no-store"});
-  if(r.ok){var t=(await r.text()).trim();if(/^[0-9a-f]{40}$/.test(t))S.sha=t;}}catch(e){}
+ /* repo renamed to Performance-Dashboard: use the new name once it exists, the old one until then (remembered) */
+ var REPOS=[S.repo,"E-Team-Performance"]; for(var ri=0;ri<REPOS.length&&!S.sha;ri++){try{var r=await fetch("https://api.github.com/repos/"+S.owner+"/"+REPOS[ri]+"/commits/"+S.branch,{headers:{Accept:"application/vnd.github.sha"},cache:"no-store"});if(r.ok){var t=(await r.text()).trim();if(/^[0-9a-f]{40}$/.test(t)){S.sha=t;S.repo=REPOS[ri];try{localStorage.setItem("teRepo",S.repo);}catch(e){}}}}catch(e){}}
+ if(!S.sha){try{var rk2=localStorage.getItem("teRepo");if(rk2)S.repo=rk2;else S.repo="E-Team-Performance";}catch(e){S.repo="E-Team-Performance";}}
  S.raw=function(p){return "https://raw.githubusercontent.com/"+S.owner+"/"+S.repo+"/"+(S.sha||S.branch)+"/"+S.dir+"/"+p+(S.sha?"":"?t="+Date.now());};
  var boot=null;try{var b=await fetch(S.raw("boot.js"),{cache:"no-store"});if(b.ok){boot=await b.text();S.idb.put(S.ns+"boot",boot);}}catch(e){}
  if(!boot){boot=await S.idb.get(S.ns+"boot");S.offline=true;}

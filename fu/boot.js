@@ -17,6 +17,6 @@
  put("cfgseed",J(cfgO==null?null:cfgO));put("noteseed","{}");
  var ver=(appH.match(/app-version" content="([^"]*)"/)||[])[1]||"0.0.0";
  var info={owner:S.owner,repo:S.repo,branch:S.branch,dir:S.dir,dataRepo:S.dataRepo,sha:S.sha,offline:!!S.offline,ver:ver,dataBase:dataBase};
- var k=h.indexOf("<head>");h=h.slice(0,k+6)+"<script>window.__FU_REMOTE="+J(info)+";window.__FU_TEAM={leader:\"Rivan\",members:[\"Atika\",\"Darwin\",\"Dilah\",\"Jusep\",\"Dimas\",\"Duta\"]};<\/script>"+h.slice(k+6);
+ var k=h.indexOf("<head>");h=h.slice(0,k+6)+"<script>window.__FU_REMOTE="+J(info)+";window.__FU_TEAM="+J(S.fuTeam||{leader:"",members:[]})+";<\/script>"+h.slice(k+6);
  document.open();document.write(h);document.close();
 })();

@@ -111,6 +111,28 @@
    else if(e&&/salah|Wrong/.test(e.textContent)){clearInterval(iv);remForget();document.getElementById("glPw").value="";e.textContent=tr2("Password tersimpan sudah tidak berlaku. Masukkan password baru.","The saved password no longer works. Enter the new one.");}
    else if(n>80)clearInterval(iv);},250);
   pend={who:c.who,pw:c.pw,rem:true};f.requestSubmit?f.requestSubmit(go):go.click();}
+
+ /* share links: the same tools opened from a web link (GitHub Pages) instead of a file */
+ var PAGES="https://"+R.owner+".github.io/"+R.repo+"/";
+ function shareLinks(){var L=[{t:tr2("Dashboard Tim ","Team dashboard ")+TEAM,u:PAGES+R.dir+"/",all:1}];
+  if(VIEW==="tl"){var ms=(STORE.members||[]).filter(Boolean);L.push({t:"Cek Foto Bukti · Tim "+TEAM,u:PAGES+"ocr-"+TEAM.toLowerCase()+"/#p="+encodeURIComponent(ms.join(",")),d:tr2("Nama anggota ikut di dalam link, jadi bagikan hanya ke tim ini.","Member names are inside this link: share it only with this team.")});
+   if(TEAM==="E"){var ld=STORE.leader||"",mm=ms.filter(function(n){return n!==ld;});L.push({t:"FU & Tugas · Tim E",u:PAGES+"fu/#t="+encodeURIComponent(ld+":"+mm.join(",")),d:tr2("Nama anggota ikut di dalam link.","Member names are inside this link.")});}}
+  return L;}
+ async function copyTxt(t){try{await navigator.clipboard.writeText(t);return true;}catch(e){}var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;left:-9999px";document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy");}catch(e){}a.remove();return ok;}
+ function openShare(){var old=document.getElementById("teShare");if(old)old.remove();
+  var ov=document.createElement("div");ov.id="teShare";ov.style.cssText="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px";
+  var bx=document.createElement("div");bx.style.cssText="width:min(560px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:16px 18px;background:linear-gradient(var(--card2),var(--card2)),var(--bg1);border:1px solid var(--line);color:var(--text)";
+  bx.innerHTML='<b style="font-size:15px">🔗 '+tr2("Bagikan link","Share link")+'</b><div class="small" style="margin:4px 0 12px">'+tr2("Tim cukup membuka link ini di Chrome, tanpa file. Selalu versi dan data terbaru. Data tetap terkunci password.","The team just opens this link in Chrome, no file needed. Always the newest version and data; still password-locked.")+'</div>'+
+   shareLinks().map(function(x,i){return '<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;margin-bottom:4px">'+esc(x.t)+'</div><div style="display:flex;gap:6px"><input readonly value="'+esc(x.u)+'" style="flex:1;min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;font-size:12.5px"><button class="btn primary" data-cp="'+i+'">'+tr2("Salin","Copy")+'</button>'+(navigator.share?'<button class="btn" data-sh="'+i+'">'+tr2("Kirim","Send")+'</button>':'')+'</div>'+(x.d?'<div class="small" style="margin-top:3px">'+esc(x.d)+'</div>':'')+'</div>';}).join("")+
+   '<div class="small" id="teShareSt" style="margin:2px 0 10px"></div><button class="btn" id="teShareX">'+tr2("Tutup","Close")+'</button>';
+  ov.appendChild(bx);document.body.appendChild(ov);var L=shareLinks(),st=document.getElementById("teShareSt");
+  ov.onclick=function(e){if(e.target===ov||e.target.id==="teShareX"){ov.remove();return;}var c=e.target.closest("[data-cp]"),s=e.target.closest("[data-sh]");
+   if(c){copyTxt(L[+c.dataset.cp].u).then(function(ok){c.textContent=ok?"✓ "+tr2("Tersalin","Copied"):tr2("Salin manual","Copy manually");setTimeout(function(){c.textContent=tr2("Salin","Copy");},1800);});}
+   if(s){navigator.share({title:L[+s.dataset.sh].t,url:L[+s.dataset.sh].u}).catch(function(){});}};
+  fetch(PAGES+R.dir+"/",{method:"HEAD",cache:"no-store"}).then(function(r){if(!r.ok)throw 0;}).catch(function(){st.innerHTML="⚠️ "+tr2("Link belum aktif: GitHub Pages belum dinyalakan di repo "+esc(R.repo)+" (Settings › Pages).","Link not active yet: GitHub Pages is not on for "+esc(R.repo)+".");});}
+ function shareBtn(){var g=document.querySelector("#drawer .dgrid");if(g&&!document.getElementById("teShareBtn")){var b=document.createElement("button");b.className="dbtn";b.id="teShareBtn";b.textContent="🔗 "+tr2("Bagikan link","Share link");b.onclick=function(){try{openDrawer(false);}catch(e){}openShare();};g.insertBefore(b,g.firstChild);}
+  var pb=document.getElementById("ghPub");if(pb&&!pb.hidden&&!document.getElementById("teShareBtn2")){var row=pb.querySelector(".dpa");if(row){var b2=document.createElement("button");b2.className="btn";b2.id="teShareBtn2";b2.textContent="🔗 "+tr2("Link untuk tim","Team links");b2.onclick=openShare;row.appendChild(b2);}}}
+ setInterval(shareBtn,800);shareBtn();
  setInterval(gateWatch,300);gateWatch();
  setInterval(ensure,700);ensure();
  try{renderStale();}catch(e){}

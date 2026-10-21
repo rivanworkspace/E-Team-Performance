@@ -2,7 +2,7 @@
 <html lang="id" data-theme="light"><head>
 <meta data-o charset="utf-8">
 <meta data-o name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta data-o name="app-version" content="0.2.0">
+<meta data-o name="app-version" content="0.2.1">
 <title data-o>FU & Tugas · Team E</title>
 <style data-o>
 :root{--bg:#eef2f9;--card:#fff;--card2:#f7f9fc;--line:#d5dcea;--ink:#141b2d;--mute:#5d6882;--acc:#3b5bdb;--acc2:#2e46ad;--pos:#1a7f4b;--warn:#b5760b;--neg:#c0392b;--soft:rgba(20,27,45,.05)}
@@ -95,7 +95,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 /* FU & Tugas Team E — core. Data model & crypto described in README of E-Team-Tasks-Reminder. */
 "use strict";
 const R=window.__FU_REMOTE||{owner:"",repo:"",dir:"fu",dataRepo:"E-Team-Tasks-Reminder",sha:null,offline:false,ver:"0.0.0"};
-const TEAM=window.__FU_TEAM||{leader:"Rivan",members:["Atika","Darwin","Dilah","Jusep","Dimas","Duta"]};
+const TEAM=window.__FU_TEAM||{leader:"",members:[]};
 const $=s=>document.querySelector(s),el=(t,a,h)=>{const e=document.createElement(t);if(a)for(const k in a)k==="class"?e.className=a[k]:k==="html"?e.innerHTML=a[k]:e.setAttribute(k,a[k]);if(h!=null)e.textContent=h;return e;};
 const te=new TextEncoder(),td=new TextDecoder();
 const b64=b=>{const a=new Uint8Array(b);let s="";for(let i=0;i<a.length;i+=8192)s+=String.fromCharCode.apply(null,a.subarray(i,i+8192));return btoa(s);};
@@ -537,8 +537,8 @@ async function saveLocal(){try{const d=await idb();if(!d)return;const notesOut={
 /* ================= login screen ================= */
 function logout(){remForget();ME=null;REPO_TOKEN=null;showLogin();}
 function showLogin(){const r=$("#root");r.innerHTML="";const c=el("div",{class:"center"});const box=el("div",{class:"lbox card"});
- box.appendChild(el("b",null,"FU & Tugas · Team E"));box.appendChild(el("div",{class:"sub",style:"margin-top:4px"},"Masuk untuk melihat follow-up dan tugas Anda."));
- const who=el("select");who.appendChild(el("option",{value:""},"— pilih nama —"));who.appendChild(el("option",{value:"__tl"},"Rivan (Team Leader)"));TEAM.members.forEach(m=>who.appendChild(el("option",{value:m},m)));
+ box.appendChild(el("b",null,"FU & Tugas · Team E"));if(!TEAM.members.length)box.appendChild(el("div",{class:"err",style:"margin-top:6px"},"Daftar nama tim belum ada di Chrome ini. Buka lewat link dari TL, atau pakai file pembuka FU terbaru."));box.appendChild(el("div",{class:"sub",style:"margin-top:4px"},"Masuk untuk melihat follow-up dan tugas Anda."));
+ const who=el("select");who.appendChild(el("option",{value:""},"— pilih nama —"));who.appendChild(el("option",{value:"__tl"},(TEAM.leader||"TL")+" (Team Leader)"));TEAM.members.forEach(m=>who.appendChild(el("option",{value:m},m)));
  box.appendChild(el("label",{style:"margin-top:10px"},"Nama"));box.appendChild(who);
  const pwl=el("label",{style:"margin-top:10px"},"Password");const pw=el("input",{type:"password",autocomplete:"current-password"});box.appendChild(pwl);box.appendChild(pw);
  const codeWrap=el("div",{hidden:""});codeWrap.appendChild(el("label",{style:"margin-top:10px"},"Kode aktivasi dari TL (hanya pertama kali)"));const code=el("input",{placeholder:"XXXX-XXXX"});codeWrap.appendChild(code);

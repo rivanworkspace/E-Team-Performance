@@ -151,6 +151,12 @@
  /* "Switch group" / leaving TL data: show the sign-in screen once instead of signing straight back in */
  document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest("#glSwitch")){try{sessionStorage.setItem("teNoAuto","1");}catch(x){}}},true);
  if(typeof exitTL==="function"){var _xt=exitTL;exitTL=function(){try{sessionStorage.setItem("teNoAuto","1");}catch(x){}return _xt.apply(this,arguments);};}
+ /* messages from the file-based workflow ("Download HTML terbaru…") point to Publish here */
+ (function(){var RE=/Klik\s+"?⬇?\s*Download HTML terbaru"?[^.]*\./g,RE2=/Click\s+"?⬇?\s*Download latest HTML"?[^.]*\./g,PUB=function(){return tr2("Klik ☁️ Publish supaya tim mendapat perubahan ini.","Click ☁️ Publish so the team gets this change.");};
+  function fix(n){if(n.nodeType===3){var t=n.nodeValue;if(t&&(t.indexOf("Download HTML terbaru")>=0||t.indexOf("Download latest HTML")>=0)&&!(n.parentNode&&n.parentNode.closest&&n.parentNode.closest("button,#ghPub"))){var v=t.replace(RE,PUB()).replace(RE2,PUB());if(v!==t)n.nodeValue=v;}return;}
+   if(n.nodeType===1&&!/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/.test(n.tagName)){for(var c=n.firstChild;c;c=c.nextSibling)fix(c);}}
+  try{new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==="characterData")fix(m.target);else m.addedNodes.forEach(fix);});}).observe(document.body,{childList:true,subtree:true,characterData:true});}catch(e){}
+  fix(document.body);})();
  setInterval(gateWatch,300);gateWatch();
  setInterval(ensure,700);ensure();
  try{renderStale();}catch(e){}
